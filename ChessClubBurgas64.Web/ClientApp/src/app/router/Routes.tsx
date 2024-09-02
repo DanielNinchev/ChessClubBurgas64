@@ -19,6 +19,7 @@ export const routes: RouteObject[] = [
                 {path: 'profiles/:username', element: <ProfilePage />},
             ]},
             {path: 'announcements', element: <AnnouncementDashboard />},
+            {path: 'announcements/create', element: <AnnouncementForm key='create' />},
             //{path: 'announcements/:id', element: <AnnouncementDetails />},
             {path: 'not-found', element: <NotFound />},
             {path: 'server-error', element: <ServerError />},

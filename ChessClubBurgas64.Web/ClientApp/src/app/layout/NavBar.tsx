@@ -21,9 +21,6 @@ export default observer(function NavBar() {
                 <Menu.Item as={NavLink} to='/activities' name='Контакти' />
 
                 <Menu.Item position='right'>
-                    <Menu.Item>
-                        <Button as={NavLink} to='/createActivity' positive content='Записване' />
-                    </Menu.Item>
                     {isLoggedIn ? (
                         <Dropdown pointing='top left' text={user?.displayName}>
                             <Dropdown.Menu>
@@ -35,9 +32,6 @@ export default observer(function NavBar() {
                         <Menu.Item>
                             <Button onClick={() => modalStore.openModal(<LoginForm />)}>
                                 Вход
-                            </Button>
-                            <Button onClick={() => modalStore.openModal(<RegisterForm />)}>
-                                Регистрация
                             </Button>
                         </Menu.Item>
                     )}       

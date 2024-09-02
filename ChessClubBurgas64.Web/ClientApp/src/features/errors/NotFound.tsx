@@ -6,11 +6,11 @@ export default function NotFound() {
         <Segment placeholder>
             <Header icon>
                 <Icon name='search' />
-                Oops - we've looked everywhere but could not find what you are looking for!
+                Няма открити съвпадения с търсеното от Вас.
             </Header>
             <Segment.Inline>
                 <Button as={Link} to='/activities'>
-                    Return to activities page
+                    Назад
                 </Button>
             </Segment.Inline>
         </Segment>

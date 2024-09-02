@@ -7,7 +7,7 @@ namespace ChessClubBurgas64.Data.Models
     {
         public Announcement()
         {
-            Images = new HashSet<Image>();
+            Images = [];
         }
 
         [Key]

@@ -29,9 +29,7 @@ export default class UserStore {
 
     register = async (creds: UserFormValues) => {
         try {
-            console.log(`Registriram sa s tiq creds: ${creds}`)
             const user = await agent.Account.register(creds);
-            console.log("Setvam tokena")
             store.commonStore.setToken(user.token);
             runInAction(() => this.user = user);
             router.navigate('/announcements');

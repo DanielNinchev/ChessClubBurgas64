@@ -33,6 +33,7 @@ namespace ChessClubBurgas64.Controllers
             {
                 return NotFound();
             }
+
             var Announcement = await _context.Announcements.FindAsync(id);
 
             if (Announcement == null)
@@ -81,8 +82,9 @@ namespace ChessClubBurgas64.Controllers
         {
             if (_context.Announcements == null)
             {
-                return Problem("Entity set 'AppDbContext.Announcements'  is null.");
+                return Problem("Entity set 'AppDbContext.Announcements' is null.");
             }
+
             _context.Announcements.Add(Announcement);
             await _context.SaveChangesAsync();
 

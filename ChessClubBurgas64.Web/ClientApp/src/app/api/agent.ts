@@ -8,7 +8,6 @@ import { router } from '../router/Routes';
 import { store } from '../stores/store';
 import { Announcement, AnnouncementFormValues } from '../models/announcement';
 import { Profile } from '../models/profile';
-import { log } from 'console';
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {

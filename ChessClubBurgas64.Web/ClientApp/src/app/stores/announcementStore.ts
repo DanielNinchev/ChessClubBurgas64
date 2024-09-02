@@ -62,7 +62,7 @@ export default class AnnouncementStore {
         return params;
     }
 
-    get groupedActivities() {
+    get groupedAnnouncements() {
         return Object.entries(
             this.announcementsByDate.reduce((announcements, announcement) => {
                 const date = announcement.date!.toISOString().split('T')[0];

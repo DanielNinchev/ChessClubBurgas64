@@ -1,12 +1,13 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
-import { Grid, Loader } from 'semantic-ui-react';
+import { Button, Grid, Loader } from 'semantic-ui-react';
 import { useStore } from '../../app/stores/store';
 import { PagingParams } from '../../app/models/pagination';
 import AnnouncementListItemPlaceholder from './AnnouncementListItemPlaceHolder';
 import AnnouncementList from './AnnouncementList';
 import AnnouncementFilters from './AnnouncementFilters';
+import { Link } from 'react-router-dom';
 
 export default observer(function AnnouncementDashboard() {
     const { announcementStore } = useStore();
@@ -43,6 +44,7 @@ export default observer(function AnnouncementDashboard() {
                     )}
             </Grid.Column>
             <Grid.Column width='6'>
+                <Button as={Link} to='/announcements/create' float='center' type='button' positive content='Напиши новина' />
                 <AnnouncementFilters />
             </Grid.Column>
             <Grid.Column width='10'>

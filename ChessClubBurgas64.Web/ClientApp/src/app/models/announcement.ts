@@ -12,6 +12,7 @@ export class AnnouncementFormValues
     title: string = '';
     description: string = '';
     date: Date | null = null;
+    text: string = '';
 
 	  constructor(announcement?: AnnouncementFormValues) {
       if (announcement) {
@@ -19,6 +20,7 @@ export class AnnouncementFormValues
         this.title = announcement.title;
         this.description = announcement.description;
         this.date = announcement.date;
+        this.text = announcement.text;
       }
     }
 

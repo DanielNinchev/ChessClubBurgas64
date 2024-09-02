@@ -5,7 +5,6 @@ import { useStore } from "../../app/stores/store";
 import MyTextInput from "../../app/common/MyTextInput";
 
 export default observer(function LoginForm() {
-    console.log("Inside the login form")
     const { userStore } = useStore();
     return (
         <Formik
