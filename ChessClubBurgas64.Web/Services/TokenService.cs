@@ -13,7 +13,7 @@ namespace ChessClubBurgas64.Web.Services
     {
         private readonly IConfiguration _config = config;
 
-        public string CreateToken(AppUser user)
+        public string CreateToken(Account user)
         {
             var claims = new List<Claim>
             {

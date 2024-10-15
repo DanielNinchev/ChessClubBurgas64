@@ -7,10 +7,15 @@ export default observer(function AnnouncementFilters() {
     const {announcementStore: {predicate, setPredicate}} = useStore();
     return (
         <>
-            <Menu vertical size='large' style={{ width: '100%', marginTop: 25 }}>
+            <Menu vertical size='large' className='filter'>
                 <Header icon='filter' attached color='teal' content='Търси по избран филтър' />
                 <Menu.Item
                     content='Всички новини'
+                    active={predicate.has('all')}
+                    onClick={() => setPredicate('all', 'true')}
+                />
+                <Menu.Item
+                    content='Турнири'
                     active={predicate.has('all')}
                     onClick={() => setPredicate('all', 'true')}
                 />

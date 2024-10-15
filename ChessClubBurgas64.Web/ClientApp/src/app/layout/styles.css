@@ -3,61 +3,47 @@
   src: url('/fonts/Basil-Regular.otf') format('opentype');
 }
 
-body, .ui.menu {
-  background-color: #EAEAEA !important;
-  font-family: 'Basil-Regular', sans-serif;
+body {
+  background-image: linear-gradient(90deg, rgb(24, 42, 115) 0%, rgb(33, 138, 174) 69%, rgb(32, 167, 172) 89%) !important;
+  background-size: contain; /* Ensures the image covers the entire background */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-position: center; /* Centers the image */
+}
+
+*, #login-profile, #home-title {
+  font-family: 'Basil-Regular';
 }
 
 .ui.inverted.top.fixed.menu {
   background-image: linear-gradient(135deg, rgb(24, 42, 115) 0%, rgb(33, 138, 174) 69%, rgb(32, 167, 172) 89%) !important;
+  height: 2.5em;
 }
 
 .react-calendar {
   width: 100%;
   border: none;
-  box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15);
+  box-shadow: 0 20px 25px 0 rgba(34, 36, 38, .15);
 }
 
-/*home page styles*/
-
-.masthead {
-  display: flex;
-  align-items: center;
-  background-image: linear-gradient(
-          135deg,
-          rgb(24, 42, 115) 0%,
-          rgb(33, 138, 174) 69%,
-          rgb(32, 167, 172) 89%
-  ) !important;
-  height: 100vh;
-  font-family: 'Basil-Regular', sans-serif;
-}
-
-.ui.huge.button, .ui.huge.buttons .button, .ui.huge.buttons .or {
-  font-size: 1.42857143rem;
-  font-family: 'Basil-Regular', sans-serif;
-}
-
-.masthead .ui.menu .ui.button,
-.ui.menu a.ui.inverted.button {
-  margin-left: 0.5em;
-  font-family: 'Basil-Regular', sans-serif;
-}
-
-.masthead h1.ui.header {
-  font-size: 4em;
-  font-weight: normal;
-  font-family: 'Basil-Regular', sans-serif;
-}
-
-.masthead h2 {
-  font-size: 1.7em;
-  font-weight: normal;
-  font-family: 'Basil-Regular', sans-serif;
-}
-
-/*end home page styles*/
-
-.react-datepicker-wrapper {
+.ui.filter.vertical.large.menu{
   width: 100%;
+  margin-top: 5.5rem;
+}
+
+.primary-container{
+  max-height: 100vh;
+  max-height: 100svh;
+}
+
+#home-logo{
+  width: 60%;
+  height: auto;
+  margin-top: 4.1rem;
+  margin-bottom: 'auto'
+}
+
+#home-title {
+  font-size: 3.6rem;
+  margin-top: 2.1rem;
+  margin-bottom: 2rem;
 }

@@ -1,4 +1,5 @@
-﻿using ChessClubBurgas64.Data.Models;
+﻿using AutoMapper;
+using ChessClubBurgas64.Data.Models;
 using ChessClubBurgas64.Web.DTOs;
 using ChessClubBurgas64.Web.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -11,10 +12,11 @@ namespace ChessClubBurgas64.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController(UserManager<AppUser> userManager, ITokenService tokenService) : ControllerBase
+    public class AccountController(UserManager<Account> userManager, ITokenService tokenService, IMapper mapper) : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager = userManager;
+        private readonly UserManager<Account> _userManager = userManager;
         private readonly ITokenService _tokenService = tokenService;
+        private readonly IMapper _mapper = mapper;
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -41,25 +43,13 @@ namespace ChessClubBurgas64.Web.Controllers
         {
             try
             {
-                if (await _userManager.Users.AnyAsync(x => x.UserName == registerDto.Username))
-                {
-                    ModelState.AddModelError("username", "Профил с такова име вече съществува!");
-                    return ValidationProblem();
-                }
-
                 if (await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
                 {
                     ModelState.AddModelError("email", "Профил с такава електронна поща вече съществува!");
                     return ValidationProblem();
                 }
 
-                var user = new AppUser
-                {
-                    DisplayName = registerDto.DisplayName,
-                    Email = registerDto.Email,
-                    UserName = registerDto.Username
-                };
-
+                var user = _mapper.Map<Account>(registerDto);
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
 
                 if (result.Succeeded)
@@ -85,7 +75,7 @@ namespace ChessClubBurgas64.Web.Controllers
             return CreateUserObject(user);
         }
 
-        private UserDto CreateUserObject(AppUser user)
+        private UserDto CreateUserObject(Account user)
         {
             return new UserDto
             {

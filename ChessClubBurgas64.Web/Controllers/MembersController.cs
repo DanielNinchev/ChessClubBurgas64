@@ -18,7 +18,7 @@ namespace ChessClubBurgas64.Controllers
 
         // GET: api/Member
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Member>>> GetMembers()
+        public async Task<ActionResult<IEnumerable<Student>>> GetMembers()
         {
           if (_context.Members == null)
           {
@@ -29,7 +29,7 @@ namespace ChessClubBurgas64.Controllers
 
         // GET: api/Member/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Member>> GetMember(Guid id)
+        public async Task<ActionResult<Student>> GetMember(Guid id)
         {
           if (_context.Members == null)
           {
@@ -48,7 +48,7 @@ namespace ChessClubBurgas64.Controllers
         // PUT: api/Member/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMember(Guid id, Member member)
+        public async Task<IActionResult> PutMember(Guid id, Student member)
         {
             if (id != member.Id)
             {
@@ -79,7 +79,7 @@ namespace ChessClubBurgas64.Controllers
         // POST: api/Member
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Member>> PostMember(Member member)
+        public async Task<ActionResult<Student>> PostMember(Student member)
         {
           if (_context.Members == null)
           {

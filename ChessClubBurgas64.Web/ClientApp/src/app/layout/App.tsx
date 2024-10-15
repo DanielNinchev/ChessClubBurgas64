@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import LoadingComponent from './LoadingComponent';
 import HomePage from '../../features/home/HomePage';
 import ModalContainer from '../common/modals/ModalContainer';
+import 'semantic-ui-css/semantic.min.css';
 
 function App() {
   const location = useLocation();
@@ -31,7 +32,7 @@ function App() {
       {location.pathname === '/' ? <HomePage /> : (
         <>
           <NavBar />
-          <Container style={{ marginTop: '7em' }}>
+          <Container class="primary-content">
             <Outlet />
           </Container>
         </>

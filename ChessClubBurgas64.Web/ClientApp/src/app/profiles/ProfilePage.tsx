@@ -19,9 +19,9 @@ export default observer(function ProfilePage() {
         }
     }, [loadProfile, username, setActiveTab])
 
-    if (loadingProfile) return <LoadingComponent inverted content='Loading profile...' />
+    if (loadingProfile) return <LoadingComponent inverted content='Зареждане на профила...' />
 
-    if (!profile) return <h2>Problem loading profile</h2>
+    if (!profile) return <h2>Възникна проблем при показването на профила!</h2>
     
     return (
         <Grid>
