@@ -12,7 +12,7 @@ export default observer(function ProfileContent({ profile }: Props) {
 
     const panes = [
         { menuItem: 'Име', render: () => <profile.displayName /> },
-        { menuItem: 'Акаунт', render: () => <profile.username /> }
+        { menuItem: 'Акаунт', render: () => <profile.email /> }
     ];
 
     return (

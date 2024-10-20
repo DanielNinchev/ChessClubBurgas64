@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Container, Header, Segment, Image, HeaderContent, Icon } from "semantic-ui-react";
+import { Container, Header, Segment, Image } from "semantic-ui-react";
 import NavBar from '../../app/layout/NavBar';
 import '../../app/layout/styles.css';
 

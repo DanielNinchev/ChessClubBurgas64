@@ -16,11 +16,8 @@ export default class ModalStore {
     }
 
     openModal = (content: JSX.Element) => {
-        console.log("Otworih formata")
         this.modal.open = true;
         this.modal.body = content;
-        console.log(this.modal.open)
-        console.log(content)
     }
 
     closeModal = () => {

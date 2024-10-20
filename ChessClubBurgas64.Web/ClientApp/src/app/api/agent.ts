@@ -21,7 +21,6 @@ const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
-    console.log(`The token is: ${token}`)
     if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
     return config;
 })
@@ -54,10 +53,10 @@ axios.interceptors.response.use(async response => {
             }
             break;
         case 401:
-            toast.error('unauthorised')
+            toast.error('Не сте влезли в профила си!')
             break;
         case 403:
-            toast.error('forbidden')
+            toast.error('Нямате достъп до този ресурс!')
             break;
         case 404:
             router.navigate('/not-found');

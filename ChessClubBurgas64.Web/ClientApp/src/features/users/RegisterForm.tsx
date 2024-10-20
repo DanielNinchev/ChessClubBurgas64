@@ -14,27 +14,22 @@ export default observer(function RegisterForm() {
             onSubmit={(values, { setErrors }) =>
                 userStore.register(values).catch(error => setErrors({ error: error }))}
             validationSchema={Yup.object({
-                firstName: Yup.string().required(),
-                middleName: Yup.string().required(),
-                lastName: Yup.string().required(),
                 email: Yup.string().required(),
-                phone: Yup.string().optional(),
                 password: Yup.string().required(),
             })}
         >
             {({ handleSubmit, isSubmitting, errors, isValid, dirty }) => (
                 <Form className='ui form error' onSubmit={handleSubmit} autoComplete='off'>
-                    <Header as='h2' content='Sign up to Reactivities' color="teal" textAlign="center" />
-                    <MyTextInput placeholder="Display Name" name='displayName' />
-                    <MyTextInput placeholder="Username" name='username' />
-                    <MyTextInput placeholder="Email" name='email' />
-                    <MyTextInput placeholder="Password" name='password' type='password' />
+                    <Header as='h2' content='Регистрация' color="teal" textAlign="center" />
+                    <MyTextInput placeholder="E-mail" name='email' />
+                    <MyTextInput placeholder="Парола" name='password' type='password' />
+                    <MyTextInput placeholder="Повторете паролата" name='repeatPassword' type='password' />
                     <ErrorMessage name='error' render={() => 
                         <ValidationError errors={errors.error} />} />
                     <Button
                         disabled={!isValid || !dirty || isSubmitting} 
                         loading={isSubmitting} 
-                        positive content='Register' 
+                        positive content='Регистрирай' 
                         type="submit" fluid 
                     />
                 </Form>

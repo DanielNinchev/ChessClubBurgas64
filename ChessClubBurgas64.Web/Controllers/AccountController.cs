@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using System.Security.Claims;
 
 namespace ChessClubBurgas64.Web.Controllers
@@ -66,7 +67,7 @@ namespace ChessClubBurgas64.Web.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize("IsChessClubAdmin")]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
@@ -77,13 +78,9 @@ namespace ChessClubBurgas64.Web.Controllers
 
         private UserDto CreateUserObject(Account user)
         {
-            return new UserDto
-            {
-                DisplayName = user.DisplayName,
-                //Image = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
-                Token = _tokenService.CreateToken(user),
-                Username = user.UserName
-            };
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Token = _tokenService.CreateToken(user);
+            return userDto;
         }
     }
 }

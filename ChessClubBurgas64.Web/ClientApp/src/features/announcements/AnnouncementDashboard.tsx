@@ -11,18 +11,20 @@ import { Link } from 'react-router-dom';
 
 export default observer(function AnnouncementDashboard() {
     const { announcementStore, userStore: {user, isLoggedIn} } = useStore();
-    const { loadActivities, setPagingParams, pagination } = announcementStore;
+    const { loadAnnouncements: loadAnnouncements, setPagingParams, pagination } = announcementStore;
     const [loadingNext, setLoadingNext] = useState(false);
 
     function handleGetNext() {
         setLoadingNext(true);
         setPagingParams(new PagingParams(pagination!.currentPage + 1));
-        loadActivities().then(() => setLoadingNext(false));
+        loadAnnouncements().then(() => setLoadingNext(false));
     }
 
     useEffect(() => {
-        loadActivities();
-    }, [loadActivities])
+        console.log('User is:', user)
+        console.log('User is logged in:', isLoggedIn)
+        loadAnnouncements();
+    }, [loadAnnouncements])
 
     return (
         <Grid>
@@ -44,10 +46,10 @@ export default observer(function AnnouncementDashboard() {
                     )}
             </Grid.Column>
             <Grid.Column width='6'>
+                <AnnouncementFilters />
                 { isLoggedIn && user?.isAdmin ? 
                     (<Button as={Link} to='/announcements/create' float='center' type='button' positive content='Напиши новина' />) : (<></>)
                 }
-                <AnnouncementFilters />
             </Grid.Column>
             <Grid.Column width='10'>
                 <Loader active={loadingNext} />

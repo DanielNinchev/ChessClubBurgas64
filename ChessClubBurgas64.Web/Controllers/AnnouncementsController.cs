@@ -46,6 +46,7 @@ namespace ChessClubBurgas64.Controllers
 
         // PUT: api/Announcement/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize("IsChessClubAdmin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAnnouncement(Guid id, Announcement Announcement)
         {
@@ -77,6 +78,7 @@ namespace ChessClubBurgas64.Controllers
 
         // POST: api/Announcement
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize("IsChessClubAdmin")]
         [HttpPost]
         public async Task<ActionResult<Announcement>> PostAnnouncement(Announcement Announcement)
         {
@@ -92,6 +94,7 @@ namespace ChessClubBurgas64.Controllers
         }
 
         // DELETE: api/Announcement/id
+        [Authorize("IsChessClubAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAnnouncement(Guid id)
         {

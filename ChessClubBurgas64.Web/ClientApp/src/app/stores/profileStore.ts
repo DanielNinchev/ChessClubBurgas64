@@ -25,21 +25,21 @@ export default class ProfileStore {
 
     get isCurrentUser() {
         if (store.userStore.user && this.profile) {
-            return store.userStore.user.username === this.profile.username;
+            return store.userStore.user.email === this.profile.email;
         }
         return false;
     }
 
-    loadProfile = async (username: string) => {
+    loadProfile = async (email: string) => {
         this.loadingProfile = true;
         try {
-            const profile = await agent.Profiles.get(username);
+            const profile = await agent.Profiles.get(email);
             runInAction(() => {
                 this.profile = profile;
                 this.loadingProfile = false;
             })
         } catch (error) {
-            toast.error('Problem loading profile');
+            toast.error('Възникна проблем със зареждането на профила Ви.');
             runInAction(() => {
                 this.loadingProfile = false;
             })
@@ -51,10 +51,10 @@ export default class ProfileStore {
         try {
             await agent.Profiles.updateProfile(profile);
             runInAction(() => {
-                if (profile.displayName && profile.displayName !==
-                    store.userStore.user?.displayName) {
-                    store.userStore.setDisplayName(profile.displayName);
-                }
+                // if (profile.displayName && profile.displayName !==
+                //     store.userStore.user?.displayName) {
+                //     store.userStore.setDisplayName(profile.displayName);
+                // }
                 this.profile = { ...this.profile, ...profile as Profile };
                 this.loading = false;
             })

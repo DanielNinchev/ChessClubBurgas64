@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChessClubBurgas64.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCommit : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,7 +28,7 @@ namespace ChessClubBurgas64.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Members",
+                name: "Students",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -45,7 +45,7 @@ namespace ChessClubBurgas64.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Members", x => x.Id);
+                    table.PrimaryKey("PK_Students", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,7 +79,7 @@ namespace ChessClubBurgas64.Data.Migrations
                     LastName = table.Column<string>(type: "text", nullable: false),
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
                     IsConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    MemberId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserName = table.Column<string>(type: "text", nullable: true),
                     NormalizedUserName = table.Column<string>(type: "text", nullable: true),
                     Email = table.Column<string>(type: "text", nullable: true),
@@ -99,17 +99,16 @@ namespace ChessClubBurgas64.Data.Migrations
                 {
                     table.PrimaryKey("PK_Accounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Accounts_Members_MemberId",
-                        column: x => x.MemberId,
-                        principalTable: "Members",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Accounts_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_MemberId",
+                name: "IX_Accounts_StudentId",
                 table: "Accounts",
-                column: "MemberId",
+                column: "StudentId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -128,7 +127,7 @@ namespace ChessClubBurgas64.Data.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
-                name: "Members");
+                name: "Students");
 
             migrationBuilder.DropTable(
                 name: "Announcements");

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChessClubBurgas64.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240914145804_InitialCommit")]
-    partial class InitialCommit
+    [Migration("20241019144219_Initial-Create")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,9 +62,6 @@ namespace ChessClubBurgas64.Data.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("MiddleName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -87,6 +84,9 @@ namespace ChessClubBurgas64.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("StudentId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -95,7 +95,7 @@ namespace ChessClubBurgas64.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MemberId")
+                    b.HasIndex("StudentId")
                         .IsUnique();
 
                     b.ToTable("Accounts");
@@ -190,18 +190,16 @@ namespace ChessClubBurgas64.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Members");
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("ChessClubBurgas64.Data.Models.Account", b =>
                 {
-                    b.HasOne("ChessClubBurgas64.Data.Models.Student", "Member")
+                    b.HasOne("ChessClubBurgas64.Data.Models.Student", "Student")
                         .WithOne("Account")
-                        .HasForeignKey("ChessClubBurgas64.Data.Models.Account", "MemberId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChessClubBurgas64.Data.Models.Account", "StudentId");
 
-                    b.Navigation("Member");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("ChessClubBurgas64.Data.Models.Image", b =>

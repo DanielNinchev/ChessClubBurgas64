@@ -9,6 +9,7 @@ namespace ChessClubBurgas64.Web
         public MappingProfile()
         {
             CreateMap<RegisterDto, Account>();
+            CreateMap<Account, UserDto>();
         }
     }
 }

@@ -7,55 +7,55 @@ namespace ChessClubBurgas64.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MembersController : ControllerBase
+    public class StudentsController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public MembersController(AppDbContext context)
+        public StudentsController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Member
+        // GET: api/Student
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetMembers()
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
-          if (_context.Members == null)
+          if (_context.Students == null)
           {
               return NotFound();
           }
-            return await _context.Members.ToListAsync();
+            return await _context.Students.ToListAsync();
         }
 
-        // GET: api/Member/5
+        // GET: api/Student/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetMember(Guid id)
+        public async Task<ActionResult<Student>> GetStudent(Guid id)
         {
-          if (_context.Members == null)
+          if (_context.Students == null)
           {
               return NotFound();
           }
-            var member = await _context.Members.FindAsync(id);
+            var Student = await _context.Students.FindAsync(id);
 
-            if (member == null)
+            if (Student == null)
             {
                 return NotFound();
             }
 
-            return member;
+            return Student;
         }
 
-        // PUT: api/Member/5
+        // PUT: api/Student/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMember(Guid id, Student member)
+        public async Task<IActionResult> PutStudent(Guid id, Student Student)
         {
-            if (id != member.Id)
+            if (id != Student.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(member).State = EntityState.Modified;
+            _context.Entry(Student).State = EntityState.Modified;
 
             try
             {
@@ -63,7 +63,7 @@ namespace ChessClubBurgas64.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MemberExists(id))
+                if (!StudentExists(id))
                 {
                     return NotFound();
                 }
@@ -76,44 +76,44 @@ namespace ChessClubBurgas64.Controllers
             return NoContent();
         }
 
-        // POST: api/Member
+        // POST: api/Student
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Student>> PostMember(Student member)
+        public async Task<ActionResult<Student>> PostStudent(Student Student)
         {
-          if (_context.Members == null)
+          if (_context.Students == null)
           {
-              return Problem("Entity set 'AppDbContext.Members' is null.");
+              return Problem("Entity set 'AppDbContext.Students' is null.");
           }
-            _context.Members.Add(member);
+            _context.Students.Add(Student);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMember", new { id = member.Id }, member);
+            return CreatedAtAction("GetStudent", new { id = Student.Id }, Student);
         }
 
-        // DELETE: api/Member/id
+        // DELETE: api/Student/id
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMember(Guid id)
+        public async Task<IActionResult> DeleteStudent(Guid id)
         {
-            if (_context.Members == null)
+            if (_context.Students == null)
             {
                 return NotFound();
             }
-            var member = await _context.Members.FindAsync(id);
-            if (member == null)
+            var Student = await _context.Students.FindAsync(id);
+            if (Student == null)
             {
                 return NotFound();
             }
 
-            _context.Members.Remove(member);
+            _context.Students.Remove(Student);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool MemberExists(Guid id)
+        private bool StudentExists(Guid id)
         {
-            return (_context.Members?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Students?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace ChessClubBurgas64.Data.Models
 {
@@ -20,11 +19,10 @@ namespace ChessClubBurgas64.Data.Models
 
         public bool IsConfirmed {  get; set; }
 
-        public Guid MemberId { get; set; }
+        public Guid? StudentId { get; set; }
 
-        public virtual Student? Member { get; set; }
+        public virtual Student? Student { get; set; }
 
-        [IgnoreDataMember]
-        public string DisplayName => $"{FirstName} {LastName}";
+        public string? Username => Email;
     }
 }

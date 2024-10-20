@@ -9,7 +9,7 @@ export default function NotFound() {
                 Няма открити съвпадения с търсеното от Вас.
             </Header>
             <Segment.Inline>
-                <Button as={Link} to='/activities'>
+                <Button as={Link} to='/announcements'>
                     Назад
                 </Button>
             </Segment.Inline>

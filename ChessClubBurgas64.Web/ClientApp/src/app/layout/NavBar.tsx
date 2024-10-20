@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useStore } from "../stores/store";
 import { observer } from "mobx-react-lite";
 import LoginForm from '../../features/users/LoginForm';
+import RegisterForm from "../../features/users/RegisterForm";
 
 export default observer(function NavBar() {
     const {modalStore, userStore: {user, isLoggedIn, logout}} = useStore();
@@ -21,14 +22,17 @@ export default observer(function NavBar() {
 
                 <Menu.Item position='right'>
                     {isLoggedIn ? (
-                        <Dropdown pointing='top left' text={user?.displayName}>
+                        <Dropdown pointing='top left' text={user?.firstName}>
                             <Dropdown.Menu>
-                                <Dropdown.Item as={Link} to={`/profiles/${user?.username}`} text='Профил' icon='user circle' />
+                                <Dropdown.Item as={Link} to={`/profiles/${user?.firstName}`} text='Профил' icon='user circle' />
                                 <Dropdown.Item onClick={logout} text='Изход' icon='power' />
                             </Dropdown.Menu>
                         </Dropdown>
                     ) : (
-                        <Menu.Item as={NavLink} icon= 'user' name='Вход' onClick={() => modalStore.openModal(<LoginForm />)}/>
+                        <Menu inverted>
+                            <Menu.Item as={NavLink} icon= 'user' name='Вход' onClick={() => modalStore.openModal(<LoginForm />)}/>
+                            <Menu.Item as={NavLink} icon= 'user' name='Регистрация' onClick={() => modalStore.openModal(<RegisterForm />)}/>
+                        </Menu>
                     )}       
                 </Menu.Item>
             </Container>

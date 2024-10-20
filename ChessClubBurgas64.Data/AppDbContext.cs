@@ -8,6 +8,6 @@ namespace ChessClubBurgas64.Data
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Image> Images { get; set; }
-        public DbSet<Student> Members { get; set; }
+        public DbSet<Student> Students { get; set; }
     }
 }

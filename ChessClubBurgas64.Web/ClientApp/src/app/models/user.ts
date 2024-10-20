@@ -1,14 +1,13 @@
 export interface User {
-    username: string;
-    displayName: string;
+    email: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
     token: string;
-    image?: string;
     isAdmin: boolean;
 }
 
 export interface UserFormValues {
     email: string;
     password: string;
-    displayName?: string;
-    username?: string;
 }

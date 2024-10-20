@@ -21,7 +21,7 @@ export default class AnnouncementStore {
             () => {
                 this.pagingParams = new PagingParams();
                 this.announcementRegistry.clear();
-                this.loadActivities();
+                this.loadAnnouncements();
             }
         )
     }
@@ -77,7 +77,7 @@ export default class AnnouncementStore {
             a.date!.getTime() - b.date!.getTime());
     }
 
-    loadActivities = async () => {
+    loadAnnouncements = async () => {
         this.loadingInitial = true;
         try {
             const result = await agent.Announcements.list(this.axiosParams);

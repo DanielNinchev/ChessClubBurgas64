@@ -1,6 +1,5 @@
 import { makeAutoObservable, reaction } from "mobx";
 import { ServerError } from "../models/serverError";
-import { log } from "console";
 
 export default class CommonStore {
     error: ServerError | null = null;
@@ -27,7 +26,6 @@ export default class CommonStore {
     }
 
     setToken = (token: string | null) => {
-        console.log("Getting the token!")
         this.token = token;
     }
 
