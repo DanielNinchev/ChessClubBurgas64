@@ -1,4 +1,3 @@
-using ChessClubBurgas64.Web;
 using ChessClubBurgas64.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;

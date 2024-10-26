@@ -77,8 +77,7 @@ const requests = {
 }
 
 const Announcements = {
-    list: (params: URLSearchParams) => axios.get<PaginatedResult<Announcement[]>>('/announcements', { params })
-        .then(responseBody),
+    list: (params: URLSearchParams) => axios.get<PaginatedResult<Announcement[]>>('/announcements', { params }).then(responseBody),
     details: (id: string) => requests.get<Announcement>(`/announcements/${id}`),
     create: (announcement: AnnouncementFormValues) => requests.post<void>(`/announcements`, announcement),
     update: (announcement: AnnouncementFormValues) => requests.put<void>(`/announcements/${announcement.id}`, announcement),

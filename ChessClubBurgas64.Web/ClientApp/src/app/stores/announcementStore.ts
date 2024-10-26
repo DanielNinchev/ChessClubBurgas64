@@ -54,8 +54,12 @@ export default class AnnouncementStore {
         params.append('pageSize', this.pagingParams.pageSize.toString())
         this.predicate.forEach((value, key) => {
             if (key === 'startDate') {
+                console.log('Key is appended:', key)
                 params.append(key, (value as Date).toISOString())
             } else {
+                console.log('Key is appended:', key)
+                console.log('Value is appended:', value)
+
                 params.append(key, value);
             }
         })
@@ -65,7 +69,8 @@ export default class AnnouncementStore {
     get groupedAnnouncements() {
         return Object.entries(
             this.announcementsByDate.reduce((announcements, announcement) => {
-                const date = announcement.date!.toISOString().split('T')[0];
+                console.log('Announcement date is: ', announcement.dateCreated)
+                const date = announcement.dateCreated!.toISOString().split('T')[0];
                 announcements[date] = announcements[date] ? [...announcements[date], announcement] : [announcement];
                 return announcements;
             }, {} as { [key: string]: Announcement[] })
@@ -73,19 +78,25 @@ export default class AnnouncementStore {
     }
 
     get announcementsByDate() {
+        console.log('Announcements:', Array.from(this.announcementRegistry.values()))
         return Array.from(this.announcementRegistry.values()).sort((a, b) =>
-            a.date!.getTime() - b.date!.getTime());
+            a.dateCreated!.getTime() - b.dateCreated!.getTime());
     }
 
     loadAnnouncements = async () => {
         this.loadingInitial = true;
         try {
             const result = await agent.Announcements.list(this.axiosParams);
-            result.data.forEach(announcement => {
-                this.setAnnouncement(announcement);
-            })
-            this.setPagination(result.pagination);
-            this.setLoadingInitial(false);
+            if(result.data && result.pagination){
+                result.data.forEach(announcement => {
+                    this.setAnnouncement(announcement);
+                })
+                this.setPagination(result.pagination);
+                this.setLoadingInitial(false);
+            }
+            else{
+                console.log('No data or pagination found in result!')
+            }
         } catch (error) {
             console.log(error);
             this.setLoadingInitial(false);
@@ -118,7 +129,9 @@ export default class AnnouncementStore {
     }
 
     private setAnnouncement = (announcement: Announcement) => {
-        announcement.date = new Date(announcement.date!);
+
+        console.log('Announcement is:', announcement)
+        announcement.dateCreated = new Date(announcement.dateCreated!);
         this.announcementRegistry.set(announcement.id, announcement);
     }
 
@@ -170,5 +183,13 @@ export default class AnnouncementStore {
                 this.loading = false;
             })
         }
+    }
+
+    setImage = (image: string) => {
+        if (this.selectedAnnouncement) this.selectedAnnouncement.mainPhotoUrl = image;
+    }
+
+    setMainPhoto = (url: string) => {
+        if (this.selectedAnnouncement) this.selectedAnnouncement.mainPhotoUrl = url;
     }
 }

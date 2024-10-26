@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { bg } from 'date-fns/locale';
 import { Link } from "react-router-dom";
 import { Item, Button, Icon, Segment } from "semantic-ui-react";
 import { Announcement } from "../../app/models/announcement";
@@ -13,20 +14,20 @@ export default function AnnouncementListItem({ announcement }: Props) {
             <Segment>
                 <Item.Group>
                     <Item>
-                        <Item.Image style={{marginBottom: 5}} size='tiny' circular 
-                            src={'/assets/user.png'} />
+                        <Item.Image style={{marginBottom: 5}} size='large' 
+                            src={announcement.title} />
                         <Item.Content>
                             <Item.Header as={Link} to={`/announcements/${announcement.id}`}>
                                 {announcement.title}
                             </Item.Header>
-                            <Item.Description>Item description</Item.Description>
+                            <Item.Description>Описание</Item.Description>
                         </Item.Content>
                     </Item>
                 </Item.Group>
             </Segment>
             <Segment>
                 <span>
-                    <Icon name='clock' /> {format(announcement.date!, 'dd MMM yyyy h:mm aa')}
+                    <Icon name='clock' /> {format(announcement.dateCreated!, "d MMMM yyyy 'г.,' H:mm 'ч.'", { locale: bg })}
                 </span>
             </Segment>
             <Segment clearing>

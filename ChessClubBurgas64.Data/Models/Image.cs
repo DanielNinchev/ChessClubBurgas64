@@ -12,8 +12,6 @@ namespace ChessClubBurgas64.Data.Models
 
         public string Info { get; set; }
 
-        public bool IsMain { get; set; }
-
         public Guid AnnouncementId { get; set; }
 
         public virtual Announcement Announcement { get; set; }

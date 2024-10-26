@@ -18,11 +18,12 @@ export default observer(function AnnouncementDashboard() {
         setLoadingNext(true);
         setPagingParams(new PagingParams(pagination!.currentPage + 1));
         loadAnnouncements().then(() => setLoadingNext(false));
+
+        console.log('Pagination:', pagination)
+        console.log('LoadingNext:', loadingNext)
     }
 
     useEffect(() => {
-        console.log('User is:', user)
-        console.log('User is logged in:', isLoggedIn)
         loadAnnouncements();
     }, [loadAnnouncements])
 

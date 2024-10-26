@@ -23,6 +23,8 @@ namespace ChessClubBurgas64.Data.Models
 
         public string Text { get; set; }
 
+        public string MainPhotoUrl { get; set; }
+
         public virtual IEnumerable<Image> Images { get; set; }
     }
 }

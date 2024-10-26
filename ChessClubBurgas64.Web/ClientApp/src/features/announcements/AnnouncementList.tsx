@@ -6,11 +6,11 @@ import AnnouncementListItem from './AnnouncementListItem';
 
 export default observer(function AnnouncementList() {
     const { announcementStore } = useStore();
-    const { groupedAnnouncements: groupedActivities } = announcementStore;
+    const { groupedAnnouncements } = announcementStore;
 
     return (
         <>
-            {groupedActivities.map(([group, announcements]) => (
+            {groupedAnnouncements.map(([group, announcements]) => (
                 <Fragment key={group}>
                     <Header sub color='teal'>
                         {group}
