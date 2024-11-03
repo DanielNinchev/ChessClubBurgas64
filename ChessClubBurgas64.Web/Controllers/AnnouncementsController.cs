@@ -5,6 +5,7 @@ using ChessClubBurgas64.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Application.Core;
 using ChessClubBurgas64.Web.Core.PagingParams;
+using ChessClubBurgas64.Web.Extensions;
 
 namespace ChessClubBurgas64.Controllers
 {
@@ -30,17 +31,18 @@ namespace ChessClubBurgas64.Controllers
                  .AsQueryable();
 
             
-            var pagedList = await PagedList<Announcement>.CreateAsync(query, pagingParams.PageNumber, pagingParams.PageSize);
-            var paginationMetadata = new
-            {
-                pagedList.CurrentPage,
-                pagedList.PageSize,
-                pagedList.TotalCount,
-                pagedList.TotalPages
-            };
+            var pagedResult = await PagedList<Announcement>.CreateAsync(query, pagingParams.PageNumber, pagingParams.PageSize);
+            //var paginationMetadata = new
+            //{
+            //    pagedList.CurrentPage,
+            //    pagedList.PageSize,
+            //    pagedList.TotalCount,
+            //    pagedList.TotalPages
+            //};
 
-            Response.Headers.Append("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
-            return Results.Ok(pagedList);
+            Response.AddPaginationHeader(pagedResult.CurrentPage, pagedResult.PageSize, pagedResult.TotalCount, pagedResult.TotalPages);
+            //Response.Headers.Append("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+            return Results.Ok(pagedResult);
         }
 
         // GET: api/Announcement/5

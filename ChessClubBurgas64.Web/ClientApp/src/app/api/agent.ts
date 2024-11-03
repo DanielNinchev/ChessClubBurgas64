@@ -8,6 +8,7 @@ import { router } from '../router/Routes';
 import { store } from '../stores/store';
 import { Announcement, AnnouncementFormValues } from '../models/announcement';
 import { Profile } from '../models/profile';
+import { Photo } from '../models/photo';
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -82,6 +83,15 @@ const Announcements = {
     create: (announcement: AnnouncementFormValues) => requests.post<void>(`/announcements`, announcement),
     update: (announcement: AnnouncementFormValues) => requests.put<void>(`/announcements/${announcement.id}`, announcement),
     delete: (id: string) => requests.del<void>(`/announcements/${id}`),
+    uploadPhoto: (file: any) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<Photo>('photos', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+    },
+    setMainPhoto: (id: string) => axios.post(`/photos/${id}/setMain`, {}),
+    deletePhoto: (id: string) => axios.delete(`/photos/${id}`),
 }
 
 const Account = {
@@ -92,7 +102,7 @@ const Account = {
 
 const Profiles = {
     get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
-    updateProfile: (profile: Partial<Profile>) => requests.put(`/profiles`, profile)
+    updateProfile: (profile: Partial<Profile>) => requests.put(`/profiles`, profile),
 }
 
 const agent = {

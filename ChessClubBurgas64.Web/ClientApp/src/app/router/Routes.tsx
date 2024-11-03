@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 import AnnouncementDashboard from "../../features/announcements/AnnouncementDashboard";
-// import AnnouncementDetails from "../../features/announcements/AnnouncementDetails";
+import AnnouncementDetails from "../../features/announcements/AnnouncementDetails";
 import AnnouncementForm from "../../features/announcements/AnnouncementForm";
 import App from "../layout/App";
 import NotFound from "../../features/errors/NotFound";
@@ -20,7 +20,7 @@ export const routes: RouteObject[] = [
             ]},
             {path: 'announcements', element: <AnnouncementDashboard />},
             {path: 'announcements/create', element: <AnnouncementForm key='create' />},
-            //{path: 'announcements/:id', element: <AnnouncementDetails />},
+            {path: 'announcements/:id', element: <AnnouncementDetails />},
             {path: 'not-found', element: <NotFound />},
             {path: 'server-error', element: <ServerError />},
             {path: '*', element: <Navigate replace to='/not-found' />},

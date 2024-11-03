@@ -1,7 +1,9 @@
 import { makeAutoObservable, reaction, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Pagination, PagingParams } from "../models/pagination";
-import { Announcement, AnnouncementFormValues } from "../models/announcement";
+import { Announcement, AnnouncementFormValues, Photo } from "../models/announcement";
+import { store } from "./store";
+import { toast } from "react-toastify";
 
 export default class AnnouncementStore {
     announcementRegistry = new Map<string, Announcement>();
@@ -12,6 +14,7 @@ export default class AnnouncementStore {
     pagination: Pagination | null = null;
     pagingParams = new PagingParams();
     predicate = new Map().set('all', true);
+    uploading = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -185,11 +188,66 @@ export default class AnnouncementStore {
         }
     }
 
+    uploadPhoto = async (file: any) => {
+        this.uploading = true;
+        try {
+            const response = await agent.Announcements.uploadPhoto(file);
+            const photo = response.data;
+            runInAction(() => {
+                if (this.selectedAnnouncement) {
+                    this.selectedAnnouncement.photos?.push(photo);
+                    if (photo.isMain && store.userStore.user) {
+                        store.announcementStore.setImage(photo.url);
+                        this.selectedAnnouncement.mainPhotoUrl = photo.url;
+                    }
+                }
+                this.uploading = false;
+            })
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.uploading = false);
+        }
+    }
+
     setImage = (image: string) => {
         if (this.selectedAnnouncement) this.selectedAnnouncement.mainPhotoUrl = image;
     }
 
-    setMainPhoto = (url: string) => {
-        if (this.selectedAnnouncement) this.selectedAnnouncement.mainPhotoUrl = url;
+    setMainPhoto = async (photo: Photo) => {
+        this.loading = true;
+        try {
+            await agent.Announcements.setMainPhoto(photo.id);
+            runInAction(() => {
+                if (this.selectedAnnouncement && this.selectedAnnouncement.photos) {
+                    this.selectedAnnouncement.photos.find(a => a.isMain)!.isMain = false;
+                    this.selectedAnnouncement.photos.find(a => a.id === photo.id)!.isMain = true;
+                    this.selectedAnnouncement.mainPhotoUrl = photo.url;
+                    this.loading = false;
+                }
+            })
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.loading = false);
+        }
+    }
+
+    deletePhoto = async (photo: Photo) => {
+        this.loading = true;
+        try {
+            await agent.Announcements.deletePhoto(photo.id);
+            runInAction(() => {
+                if (this.selectedAnnouncement) {
+                    this.selectedAnnouncement.photos = this.selectedAnnouncement.photos?.filter(a => a.id !== photo.id);
+                    this.loading = false;
+                }
+            })
+        } catch (error) {
+            toast.error('Problem deleting photo');
+            this.loading = false;
+        }
+    }
+
+    clearSelectedAnnouncement = () => {
+        this.selectedAnnouncement = undefined;
     }
 }

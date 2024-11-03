@@ -37,7 +37,7 @@ export default function AnnouncementListItem({ announcement }: Props) {
                     to={`/announcements/${announcement.id}`}
                     color='teal'
                     floated='right'
-                    content='View'
+                    content='Преглед...'
                 />
             </Segment>
         </Segment.Group>

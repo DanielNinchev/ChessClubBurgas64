@@ -25,7 +25,7 @@ export default function AnnouncementListItemPlaceholder() {
                     </Segment>
                     <Segment secondary style={{ minHeight: 70 }} />
                     <Segment clearing>
-                        <Button disabled color='blue' floated='right' content='View' />
+                        <Button disabled color='blue' floated='right' content='Преглед' />
                     </Segment>
                 </Segment.Group>
             </Placeholder>
