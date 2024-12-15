@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using ChessClubBurgas64.Data;
 using Microsoft.EntityFrameworkCore;
 using ChessClubBurgas64.Infrastructure.Contracts;
-using Infrastructure.Photos;
+using Infrastructure.Images;
 
 namespace ChessClubBurgas64.Web.Extensions
 {
@@ -70,7 +70,7 @@ namespace ChessClubBurgas64.Web.Extensions
             services.AddValidatorsFromAssemblyContaining<Create>();
             services.AddHttpContextAccessor();
             services.AddScoped<IUserAccessor, UserAccessor>();
-            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.AddScoped<IImageAccessor, ImageAccessor>();
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             //services.AddSignalR();
 

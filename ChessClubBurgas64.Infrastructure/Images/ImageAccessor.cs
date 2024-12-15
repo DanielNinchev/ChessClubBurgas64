@@ -1,17 +1,17 @@
 ﻿using ChessClubBurgas64.Infrastructure.Contracts;
-using ChessClubBurgas64.Infrastructure.Photos;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using ImageUploadResult = ChessClubBurgas64.Infrastructure.Images.ImageUploadResult;
 
-namespace Infrastructure.Photos
+namespace Infrastructure.Images
 {
-    public class PhotoAccessor : IPhotoAccessor
+    public class ImageAccessor : IImageAccessor
     {
         private readonly Cloudinary _cloudinary;
 
-        public PhotoAccessor(IOptions<CloudinarySettings> config)
+        public ImageAccessor(IOptions<CloudinarySettings> config)
         {
             var account = new Account(
                 config.Value.CloudName,
@@ -21,9 +21,9 @@ namespace Infrastructure.Photos
             _cloudinary = new Cloudinary(account);
         }
 
-        public async Task<PhotoUploadResult> AddPhoto(IFormFile file)
+        public async Task<ImageUploadResult?> AddImage(IFormFile file)
         {
-            if (file.Length > 0)
+            if (file != null && file.Length > 0)
             {
                 await using var stream = file.OpenReadStream();
                 var uploadParams = new ImageUploadParams
@@ -39,9 +39,9 @@ namespace Infrastructure.Photos
                     throw new Exception(uploadResult.Error.Message);
                 }
 
-                return new PhotoUploadResult
+                return new ImageUploadResult
                 {
-                    PublicId = uploadResult.PublicId,
+                    Id = uploadResult.PublicId,
                     Url = uploadResult.SecureUrl.ToString()
                 };
             }
@@ -49,7 +49,7 @@ namespace Infrastructure.Photos
             return null;
         }
 
-        public async Task<string> DeletePhoto(string publicId)
+        public async Task<string?> DeleteImage(string publicId)
         {
             var deleteParams = new DeletionParams(publicId);
             var result = await _cloudinary.DestroyAsync(deleteParams);

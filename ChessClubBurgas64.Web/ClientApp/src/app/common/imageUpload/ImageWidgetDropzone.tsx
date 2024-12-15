@@ -6,7 +6,7 @@ interface Props {
     setFiles: (files: any) => void;
 }
 
-export default function PhotoUploadWidgetDropzone({setFiles}: Props) {
+export default function ImageWidgetDropzone({setFiles}: Props) {
     const dzStyles = {
         border: 'dashed 3px #eee',
         borderColor: '#eee',
@@ -32,7 +32,7 @@ export default function PhotoUploadWidgetDropzone({setFiles}: Props) {
         <div {...getRootProps()} style={isDragActive ? {...dzStyles, ...dzActive} : dzStyles}>
             <input {...getInputProps()} />
             <Icon name='upload' size='huge' />
-            <Header content='Drop image here' />
+            <Header content='Пуснете снимката тук или кликнете за добавяне от устройството Ви' />
         </div>
     )
 }

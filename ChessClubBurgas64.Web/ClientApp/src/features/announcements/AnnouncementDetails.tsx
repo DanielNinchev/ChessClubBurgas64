@@ -1,4 +1,4 @@
-import { Container, Divider, Header, Segment } from "semantic-ui-react";
+import { Container, Divider, Header, Segment, Image } from "semantic-ui-react";
 import { observer } from 'mobx-react-lite';
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -22,6 +22,7 @@ export default observer(function AnnouncementDetails() {
         <Segment>
             <Header textAlign='center' as='h1'>{announcement.title}</Header>
             <Divider/>
+            <Image src={announcement.mainImageUrl}/>
             <Container textAlign="justified" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(announcement.text) }}></Container>
         </Segment>
     )

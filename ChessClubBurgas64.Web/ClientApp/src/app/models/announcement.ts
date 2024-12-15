@@ -2,29 +2,28 @@ export interface Announcement {
     id: string;
     title: string;
     dateCreated: Date | null;
+    dateUpdated: Date | null;
     description: string;
     text: string;
-    mainPhotoUrl: string;
-    photos: Photo[]
+    mainImageUrl: string;
+    images: Image[]
 }
 
 export class AnnouncementFormValues
 {
   id?: string = undefined;
   title: string = '';
-  dateCreated: Date | null = null;
   description: string = '';
   text: string = '';
-  mainPhotoUrl: string = '';
+  mainImageUrl: string = '';
   
   constructor(announcement?: AnnouncementFormValues) {
     if (announcement) {
       this.id = announcement.id;
       this.title = announcement.title;
       this.description = announcement.description;
-      this.dateCreated = announcement.dateCreated;
       this.text = announcement.text;
-      this.mainPhotoUrl = announcement.mainPhotoUrl;
+      this.mainImageUrl = announcement.mainImageUrl;
     }
   }
 }
@@ -35,7 +34,7 @@ export class Announcement implements Announcement {
   }
 }
 
-export interface Photo {
+export interface Image {
   id: string;
   url: string;
   isMain: boolean;

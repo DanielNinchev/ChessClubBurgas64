@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace ChessClubBurgas64.Web.DTOs
+namespace ChessClubBurgas64.Web.DTOs.AccountDTOs
 {
     public class RegisterDto
     {

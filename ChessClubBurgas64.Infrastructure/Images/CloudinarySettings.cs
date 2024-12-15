@@ -1,5 +1,5 @@
 ﻿#nullable disable
-namespace Infrastructure.Photos
+namespace Infrastructure.Images
 {
     public class CloudinarySettings
     {

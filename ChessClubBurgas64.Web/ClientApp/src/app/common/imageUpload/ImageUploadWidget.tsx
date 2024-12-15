@@ -1,21 +1,27 @@
 import { useEffect, useState } from 'react';
 import { Button, Grid, Header } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
-import PhotoUploadWidgetDropzone from './PhotoWidgetDropzone';
-import PhotoWidgetCropper from './PhotoWidgetCropper';
+import ImageWidgetDropzone from './ImageWidgetDropzone';
+import ImageWidgetCropper from './ImageWidgetCropper';
 
 interface Props {
     loading: boolean;
-    uploadPhoto: (file: Blob) => void;
+    uploadImage: (file: Blob) => void;
+    setFiles: (files: Blob[]) => void;
 }
 
-export default observer(function PhotoUploadWidget({ loading, uploadPhoto }: Props) {
-    const [files, setFiles] = useState<any>([]);
+export default observer(function ImageUploadWidget({loading, uploadImage, setFiles }: Props) {
+    const [files, setLocalFiles] = useState<any>([]);
     const [cropper, setCropper] = useState<Cropper>();
 
     function onCrop() {
         if (cropper) {
-            cropper.getCroppedCanvas().toBlob(blob => uploadPhoto(blob!))
+            cropper.getCroppedCanvas().toBlob(blob => {
+                if (blob) { 
+                    uploadImage(blob); 
+                    setFiles([blob]);
+                }
+            });
         }
     }
 
@@ -27,23 +33,23 @@ export default observer(function PhotoUploadWidget({ loading, uploadPhoto }: Pro
 
     return (
         <>
-            <Grid>
+            <Grid centered>
                 <Grid.Row />
                 <Grid.Column width={4}>
-                    <Header color='teal' sub content='Стъпка 1 - Добавяне на снимка' />
-                    <PhotoUploadWidgetDropzone setFiles={setFiles} />
+                    <Header color='teal' sub content='1. Добавяне на снимка' />
+                    <ImageWidgetDropzone setFiles={setLocalFiles} />
                 </Grid.Column>
                 <Grid.Column width={1} />
                 <Grid.Column width={4}>
-                    <Header sub color='teal' content='Стъпка 2 - Преоразмеряване на снимката' />
+                    <Header sub color='teal' content='2. Преоразмеряване на снимката' />
                     {files && files.length > 0 &&
-                        <PhotoWidgetCropper setCropper={setCropper} imagePreview={files[0].preview} />
+                        <ImageWidgetCropper setCropper={setCropper} imagePreview={files[0].preview} />
                     }
 
                 </Grid.Column>
                 <Grid.Column width={1} />
                 <Grid.Column width={4}>
-                    <Header sub color='teal' content='Стъпка 3 - Преглед и качване' />
+                    <Header sub color='teal' content='3. Преглед и запазване' />
                     <div className="img-preview" style={{ minHeight: 200, overflow: 'hidden' }} />
                     {files && files.length > 0 && (
                         <>

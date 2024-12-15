@@ -60,6 +60,7 @@ axios.interceptors.response.use(async response => {
             toast.error('Нямате достъп до този ресурс!')
             break;
         case 404:
+            console.log("Това е полето data:", data)
             router.navigate('/not-found');
             break;
         case 500:
@@ -80,18 +81,28 @@ const requests = {
 const Announcements = {
     list: (params: URLSearchParams) => axios.get<PaginatedResult<Announcement[]>>('/announcements', { params }).then(responseBody),
     details: (id: string) => requests.get<Announcement>(`/announcements/${id}`),
-    create: (announcement: AnnouncementFormValues) => requests.post<void>(`/announcements`, announcement),
+    create: async (announcement: AnnouncementFormValues, file: Blob) => {
+        let formData = new FormData();
+        formData.append('Title', announcement.title);
+        formData.append('Description', announcement.description);
+        formData.append('Text', announcement.text);
+        formData.append('MainImage', file);
+        const response = await axios.post('/announcements', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return responseBody(response);
+    },
     update: (announcement: AnnouncementFormValues) => requests.put<void>(`/announcements/${announcement.id}`, announcement),
     delete: (id: string) => requests.del<void>(`/announcements/${id}`),
-    uploadPhoto: (file: any) => {
+    uploadImage: (file: any) => {
         let formData = new FormData();
-        formData.append('File', file);
+        formData.append('MainImage', file);
         return axios.post<Photo>('photos', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
     },
-    setMainPhoto: (id: string) => axios.post(`/photos/${id}/setMain`, {}),
-    deletePhoto: (id: string) => axios.delete(`/photos/${id}`),
+    setMainImage: (id: string) => axios.post(`/photos/${id}/setMain`, {}),
+    deleteMainImage: (id: string) => axios.delete(`/photos/${id}`),
 }
 
 const Account = {

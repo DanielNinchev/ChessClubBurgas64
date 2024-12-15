@@ -1,7 +1,7 @@
 import { makeAutoObservable, reaction, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Pagination, PagingParams } from "../models/pagination";
-import { Announcement, AnnouncementFormValues, Photo } from "../models/announcement";
+import { Announcement, AnnouncementFormValues, Image } from "../models/announcement";
 import { store } from "./store";
 import { toast } from "react-toastify";
 
@@ -72,7 +72,8 @@ export default class AnnouncementStore {
     get groupedAnnouncements() {
         return Object.entries(
             this.announcementsByDate.reduce((announcements, announcement) => {
-                console.log('Announcement date is: ', announcement.dateCreated)
+                console.log(announcement.dateCreated)
+                console.log("This is the announcement: ", announcement)
                 const date = announcement.dateCreated!.toISOString().split('T')[0];
                 announcements[date] = announcements[date] ? [...announcements[date], announcement] : [announcement];
                 return announcements;
@@ -132,7 +133,6 @@ export default class AnnouncementStore {
     }
 
     private setAnnouncement = (announcement: Announcement) => {
-
         console.log('Announcement is:', announcement)
         announcement.dateCreated = new Date(announcement.dateCreated!);
         this.announcementRegistry.set(announcement.id, announcement);
@@ -146,12 +146,22 @@ export default class AnnouncementStore {
         this.loadingInitial = state;
     }
 
-    createAnnouncement = async (announcement: AnnouncementFormValues) => {
+    createAnnouncement = async (announcement: AnnouncementFormValues, file: Blob) => {
         try {
-            await agent.Announcements.create(announcement);
-            const newAnnouncement = new Announcement(announcement);
+            const response = await agent.Announcements.create(announcement, file);
+            console.log('Form Data is: ', response)
+            const newAnnouncement = response;
+            console.log('New announcement is:', newAnnouncement)
+            for (const image of response.images) {
+                if (image.isMain) {
+                    store.announcementStore.setImage(image.url);
+                    announcement.mainImageUrl = image.url;
+                    break;
+                }
+            }
             this.setAnnouncement(newAnnouncement);
             runInAction(() => this.selectedAnnouncement = newAnnouncement);
+            return newAnnouncement
         } catch (error) {
             console.log(error);
         }
@@ -188,17 +198,17 @@ export default class AnnouncementStore {
         }
     }
 
-    uploadPhoto = async (file: any) => {
+    uploadImage = async (file: any) => {
         this.uploading = true;
         try {
-            const response = await agent.Announcements.uploadPhoto(file);
-            const photo = response.data;
+            const response = await agent.Announcements.uploadImage(file);
+            const image = response.data;
             runInAction(() => {
                 if (this.selectedAnnouncement) {
-                    this.selectedAnnouncement.photos?.push(photo);
-                    if (photo.isMain && store.userStore.user) {
-                        store.announcementStore.setImage(photo.url);
-                        this.selectedAnnouncement.mainPhotoUrl = photo.url;
+                    this.selectedAnnouncement.images?.push(image);
+                    if (image.isMain && store.userStore.user) {
+                        store.announcementStore.setImage(image.url);
+                        this.selectedAnnouncement.mainImageUrl = image.url;
                     }
                 }
                 this.uploading = false;
@@ -210,18 +220,18 @@ export default class AnnouncementStore {
     }
 
     setImage = (image: string) => {
-        if (this.selectedAnnouncement) this.selectedAnnouncement.mainPhotoUrl = image;
+        if (this.selectedAnnouncement) this.selectedAnnouncement.mainImageUrl = image;
     }
 
-    setMainPhoto = async (photo: Photo) => {
+    setMainImage = async (image: Image) => {
         this.loading = true;
         try {
-            await agent.Announcements.setMainPhoto(photo.id);
+            await agent.Announcements.setMainImage(image.id);
             runInAction(() => {
-                if (this.selectedAnnouncement && this.selectedAnnouncement.photos) {
-                    this.selectedAnnouncement.photos.find(a => a.isMain)!.isMain = false;
-                    this.selectedAnnouncement.photos.find(a => a.id === photo.id)!.isMain = true;
-                    this.selectedAnnouncement.mainPhotoUrl = photo.url;
+                if (this.selectedAnnouncement && this.selectedAnnouncement.images) {
+                    this.selectedAnnouncement.images.find(a => a.isMain)!.isMain = false;
+                    this.selectedAnnouncement.images.find(a => a.id === image.id)!.isMain = true;
+                    this.selectedAnnouncement.mainImageUrl = image.url;
                     this.loading = false;
                 }
             })
@@ -231,13 +241,13 @@ export default class AnnouncementStore {
         }
     }
 
-    deletePhoto = async (photo: Photo) => {
+    deleteImage = async (image: Image) => {
         this.loading = true;
         try {
-            await agent.Announcements.deletePhoto(photo.id);
+            await agent.Announcements.deleteMainImage(image.id);
             runInAction(() => {
                 if (this.selectedAnnouncement) {
-                    this.selectedAnnouncement.photos = this.selectedAnnouncement.photos?.filter(a => a.id !== photo.id);
+                    this.selectedAnnouncement.images = this.selectedAnnouncement.images?.filter(a => a.id !== image.id);
                     this.loading = false;
                 }
             })

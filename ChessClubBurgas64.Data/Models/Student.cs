@@ -21,9 +21,9 @@ namespace ChessClubBurgas64.Data.Models
 
         public int? PuzzlePoints { get; set; }
 
-        public DateTime DateCreated { get; set; } = DateTime.Now;
+        public static DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
-        public DateTime DateUpdated { get; set; } = DateTime.Now;
+        public DateTime DateUpdated { get; set; } = DateTime.UtcNow;
 
         public Guid AccountId { get; set; }
 

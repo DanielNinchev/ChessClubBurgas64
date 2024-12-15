@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using ChessClubBurgas64.Data.Models;
-using ChessClubBurgas64.Web.DTOs;
+using ChessClubBurgas64.Web.DTOs.AccountDTOs;
 using ChessClubBurgas64.Web.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
 using System.Security.Claims;
 
 namespace ChessClubBurgas64.Web.Controllers
