@@ -32,7 +32,7 @@ function App() {
       {location.pathname === '/' ? <HomePage /> : (
         <>
           <NavBar />
-          <Container class="primary-content">
+          <Container className="primary-content">
             <Outlet />
           </Container>
         </>

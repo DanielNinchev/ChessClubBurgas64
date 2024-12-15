@@ -1,10 +1,11 @@
-﻿using ChessClubBurgas64.Infrastructure.Security.Contracts;
-using ChessClubBurgas64.Infrastructure.Security;
+﻿using ChessClubBurgas64.Infrastructure.Security;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using ChessClubBurgas64.Data;
 using Microsoft.EntityFrameworkCore;
+using ChessClubBurgas64.Infrastructure.Contracts;
+using Infrastructure.Images;
 
 namespace ChessClubBurgas64.Web.Extensions
 {
@@ -69,8 +70,8 @@ namespace ChessClubBurgas64.Web.Extensions
             services.AddValidatorsFromAssemblyContaining<Create>();
             services.AddHttpContextAccessor();
             services.AddScoped<IUserAccessor, UserAccessor>();
-            //services.AddScoped<IPhotoAccessor, PhotoAccessor>();
-            //services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+            services.AddScoped<IImageAccessor, ImageAccessor>();
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             //services.AddSignalR();
 
             return services;

@@ -1,5 +1,7 @@
 ﻿#nullable disable
-namespace ChessClubBurgas64.Web.DTOs
+using ChessClubBurgas64;
+
+namespace ChessClubBurgas64.Web.DTOs.AccountDTOs
 {
     public class UserDto
     {

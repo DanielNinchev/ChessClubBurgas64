@@ -30,6 +30,12 @@ body {
   margin-top: 5.5rem;
 }
 
+.primary-content{
+  margin-top: 5.5rem;
+  max-height: 100vh;
+  max-height: 100svh;
+}
+
 .primary-container{
   max-height: 100vh;
   max-height: 100svh;

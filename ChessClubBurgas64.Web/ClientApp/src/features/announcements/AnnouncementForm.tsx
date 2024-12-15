@@ -1,30 +1,29 @@
 import { Form, Formik } from "formik";
 import { observer } from "mobx-react-lite";
-import { Button, Header, Segment } from "semantic-ui-react";
+import { Button, Divider, Header, Segment } from "semantic-ui-react";
 import { useStore } from "../../app/stores/store";
 import MyTextInput from "../../app/common/MyTextInput";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AnnouncementFormValues } from "../../app/models/announcement";
 import { useEffect, useState } from "react";
-import { v4 as uuid } from 'uuid';
 import * as Yup from 'yup';
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import MyTextArea from "../../app/common/MyTextArea";
-import MyDateInput from "../../app/common/MyDateInput";
+import MySunEditor from "../../app/common/MySunEditor";
+import MyImageUpload from "../../app/common/MyImageUpload";
 
 export default observer(function AnnouncementForm() {
     const { announcementStore } = useStore();
-    const { createAnnouncement, updateAnnouncement, loadAnnouncement, loadingInitial } = announcementStore;
+    const { createAnnouncement, updateAnnouncement, loadAnnouncement, loadingInitial, uploadImage, uploading } = announcementStore;
     const { id } = useParams();
     const navigate = useNavigate();
-
     const [announcement, setAnnouncement] = useState<AnnouncementFormValues>(new AnnouncementFormValues());
-
+    const [files, setFiles] = useState<Blob[]>([]);
     const validationSchema = Yup.object({
         title: Yup.string().required('Заглавието е задължително!'),
         description: Yup.string().required('Описанието е задължително!'),
-        date: Yup.string().required('Датата е задължителна').nullable(),
         text: Yup.string().required('Съдържанието е задължително!'),
+        mainImage: Yup.array().min(1, 'Трябва да качите поне една снимка!')
     })
 
     useEffect(() => {
@@ -34,10 +33,9 @@ export default observer(function AnnouncementForm() {
     function handleFormSubmit(announcement: AnnouncementFormValues) {
         if (!announcement.id) {
             let newAnnouncement = {
-                ...announcement,
-                id: uuid()
+                ...announcement
             }
-            createAnnouncement(newAnnouncement).then(() => navigate(`/announcements/${newAnnouncement.id}`))
+            createAnnouncement(newAnnouncement, files[0]).then((response) => navigate(`/announcements/${response.id}`));
         } else {
             updateAnnouncement(announcement).then(() => navigate(`/announcements/${announcement.id}`))
         }
@@ -47,7 +45,8 @@ export default observer(function AnnouncementForm() {
 
     return (
         <Segment clearing>
-            <Header content='Подробности за новината' sub color='teal' />
+            <Header as='h2' content='Подробности за новината' color='teal' textAlign="center"/>
+            <Divider />
             <Formik
                 enableReinitialize
                 validationSchema={validationSchema}
@@ -55,18 +54,18 @@ export default observer(function AnnouncementForm() {
                 onSubmit={values =>  handleFormSubmit(values)}>
                 {({ handleSubmit, isValid, isSubmitting, dirty }) => (
                     <Form className='ui form' onSubmit={handleSubmit} autoComplete='off'>
-                        <MyTextInput name='title' placeholder='Заглавие' />
-                        <MyTextArea rows={3} name='description' placeholder='Описание' />
-                        <MyDateInput name='date' placeholderText='Дата' showTimeSelect timeCaption='time' dateFormat='MMMM d, yyyy h:mm aa' />
-                        <MyTextArea rows={5} name='text' placeholder='Съдържание' />
+                        <MyTextInput name='title' placeholder='Заглавието на новината (до 50 символа)' label='Заглавие' />
+                        <MyTextArea rows={5} name='description' placeholder='Кратко описание на новината (с няколко изречения)'  label='Описание'/>
+                        <MyImageUpload name='mainImage' label='Заглавна снимка' loading={uploading} uploadImage={(file: Blob) => setFiles([file])} setFiles={setFiles} />
+                        <MySunEditor name='text' label='Текстово съдържание:'/>
                         <Button 
                             disabled={isSubmitting || !dirty || !isValid}
                             loading={isSubmitting} 
                             floated='right' 
                             positive 
                             type='submit' 
-                            content='Submit' />
-                        <Button as={Link} to='/announcements' floated='right' type='button' content='Cancel' />
+                            content='Публикуване' />
+                        <Button as={Link} to='/announcements' floated='right' type='button' content='Отказ' />
                     </Form>
                 )}
             </Formik>

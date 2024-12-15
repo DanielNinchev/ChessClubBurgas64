@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Segment, Button, Placeholder } from 'semantic-ui-react';
+import { Segment, Placeholder } from 'semantic-ui-react';
 
 export default function AnnouncementListItemPlaceholder() {
     return (
@@ -24,9 +24,6 @@ export default function AnnouncementListItemPlaceholder() {
                         </Placeholder>
                     </Segment>
                     <Segment secondary style={{ minHeight: 70 }} />
-                    <Segment clearing>
-                        <Button disabled color='blue' floated='right' content='View' />
-                    </Segment>
                 </Segment.Group>
             </Placeholder>
         </Fragment>

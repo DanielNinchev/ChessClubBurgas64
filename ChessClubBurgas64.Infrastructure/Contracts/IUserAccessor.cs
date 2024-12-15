@@ -1,4 +1,4 @@
-﻿namespace ChessClubBurgas64.Infrastructure.Security.Contracts
+﻿namespace ChessClubBurgas64.Infrastructure.Contracts
 {
     public interface IUserAccessor
     {

@@ -1,5 +1,5 @@
 ﻿#nullable disable
-using ChessClubBurgas64.Infrastructure.Security.Contracts;
+using ChessClubBurgas64.Infrastructure.Contracts;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
