@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace ChessClubBurgas64.Web.DTOs.AccountDTOs
+namespace ChessClubBurgas64.Web.Models.AccountModels
 {
-    public class RegisterDto
+    public class RegisterInputModel
     {
         [EmailAddress]
         public required string Email { get; set; }

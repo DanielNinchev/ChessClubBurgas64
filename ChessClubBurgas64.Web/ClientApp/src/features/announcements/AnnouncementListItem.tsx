@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { bg } from 'date-fns/locale';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Item, Button, Icon, Segment, Container, Divider, ModalHeader, ModalContent, ModalActions, Modal } from "semantic-ui-react";
 import { Announcement } from "../../app/models/announcement";
 import { observer } from "mobx-react-lite";
@@ -50,12 +50,11 @@ export default observer(function AnnouncementListItem({ announcement }: Props) {
                 <Item.Group>
                     <Item>
                         <Item.Image style={{marginBottom: 5}} size='large' 
-                            src={announcement.title} />
+                            src={announcement.mainImageUrl} />
                         <Item.Content>
                             <Item.Header as={Link} to={`/announcements/${announcement.id}`}>
                                 {announcement.title}
                             </Item.Header>
-                            <Item.Description>Описание</Item.Description>
                         </Item.Content>
                     </Item>
                 </Item.Group>

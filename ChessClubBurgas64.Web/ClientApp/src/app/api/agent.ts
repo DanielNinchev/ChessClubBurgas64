@@ -6,9 +6,8 @@ import { PaginatedResult } from '../models/pagination';
 import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
-import { Announcement, AnnouncementFormValues } from '../models/announcement';
+import { Announcement, AnnouncementFormValues, Image } from '../models/announcement';
 import { Profile } from '../models/profile';
-import { Photo } from '../models/photo';
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -92,17 +91,20 @@ const Announcements = {
         });
         return responseBody(response);
     },
-    update: (announcement: AnnouncementFormValues) => requests.put<void>(`/announcements/${announcement.id}`, announcement),
-    delete: (id: string) => requests.del<void>(`/announcements/${id}`),
-    uploadImage: (file: any) => {
+    update: async (announcement: AnnouncementFormValues, file: Blob) => {
         let formData = new FormData();
+        formData.append('Title', announcement.title);
+        formData.append('Description', announcement.description);
+        formData.append('Text', announcement.text);
         formData.append('MainImage', file);
-        return axios.post<Photo>('photos', formData, {
+
+        await axios.put(`/announcements/${announcement.id}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
-        })
+        });
     },
-    setMainImage: (id: string) => axios.post(`/photos/${id}/setMain`, {}),
-    deleteMainImage: (id: string) => axios.delete(`/photos/${id}`),
+
+    delete: (id: string) => requests.del<void>(`/announcements/${id}`),
+
 }
 
 const Account = {

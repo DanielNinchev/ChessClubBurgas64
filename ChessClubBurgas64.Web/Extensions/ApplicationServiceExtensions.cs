@@ -6,6 +6,9 @@ using ChessClubBurgas64.Data;
 using Microsoft.EntityFrameworkCore;
 using ChessClubBurgas64.Infrastructure.Contracts;
 using Infrastructure.Images;
+using ChessClubBurgas64.Web.Core;
+using ChessClubBurgas64.Web.Services.Contracts;
+using ChessClubBurgas64.Web.Services;
 
 namespace ChessClubBurgas64.Web.Extensions
 {
@@ -69,9 +72,10 @@ namespace ChessClubBurgas64.Web.Extensions
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<Create>();
             services.AddHttpContextAccessor();
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IImageAccessor, ImageAccessor>();
-            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+            services.AddTransient<IAnnouncementsService, AnnouncementsService>();
             //services.AddSignalR();
 
             return services;

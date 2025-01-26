@@ -14,7 +14,7 @@ import MyImageUpload from "../../app/common/MyImageUpload";
 
 export default observer(function AnnouncementForm() {
     const { announcementStore } = useStore();
-    const { createAnnouncement, updateAnnouncement, loadAnnouncement, loadingInitial, uploadImage, uploading } = announcementStore;
+    const { createAnnouncement, updateAnnouncement, loadAnnouncement, loadingInitial, uploading } = announcementStore;
     const { id } = useParams();
     const navigate = useNavigate();
     const [announcement, setAnnouncement] = useState<AnnouncementFormValues>(new AnnouncementFormValues());
@@ -37,7 +37,9 @@ export default observer(function AnnouncementForm() {
             }
             createAnnouncement(newAnnouncement, files[0]).then((response) => navigate(`/announcements/${response.id}`));
         } else {
-            updateAnnouncement(announcement).then(() => navigate(`/announcements/${announcement.id}`))
+            console.log("The number of files is", files.length)
+            console.log("The current announcement is ", announcement)
+            updateAnnouncement(announcement, files[0]).then(() => navigate(`/announcements/${announcement.id}`))
         }
     }
 
@@ -56,8 +58,8 @@ export default observer(function AnnouncementForm() {
                     <Form className='ui form' onSubmit={handleSubmit} autoComplete='off'>
                         <MyTextInput name='title' placeholder='Заглавието на новината (до 50 символа)' label='Заглавие' />
                         <MyTextArea rows={5} name='description' placeholder='Кратко описание на новината (с няколко изречения)'  label='Описание'/>
-                        <MyImageUpload name='mainImage' label='Заглавна снимка' loading={uploading} uploadImage={(file: Blob) => setFiles([file])} setFiles={setFiles} />
-                        <MySunEditor name='text' label='Текстово съдържание:'/>
+                        <MyImageUpload name='mainImage' label='Заглавна снимка' loading={uploading} uploadImage={(file: Blob) => setFiles([file])} setFiles={setFiles} initialImage={announcement.mainImageUrl}/>
+                        <MySunEditor name='text' label='Текстово съдържание:' initialValue={announcement.text}/>
                         <Button 
                             disabled={isSubmitting || !dirty || !isValid}
                             loading={isSubmitting} 

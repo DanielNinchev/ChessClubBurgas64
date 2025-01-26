@@ -8,9 +8,10 @@ interface Props {
     loading: boolean;
     uploadImage: (file: Blob) => void;
     setFiles: (files: Blob[]) => void;
+    initialImage?: string;
 }
 
-export default observer(function ImageUploadWidget({loading, uploadImage, setFiles }: Props) {
+export default observer(function ImageUploadWidget({ loading, uploadImage, setFiles, initialImage }: Props) {
     const [files, setLocalFiles] = useState<any>([]);
     const [cropper, setCropper] = useState<Cropper>();
 
@@ -26,9 +27,15 @@ export default observer(function ImageUploadWidget({loading, uploadImage, setFil
     }
 
     useEffect(() => {
-        return () => {
-            files.forEach((file: any) => URL.revokeObjectURL(file.preview))
+        if (initialImage && files.length === 0) {
+            setLocalFiles([{ preview: initialImage }]);
         }
+    }, [initialImage, files.length]);
+
+    useEffect(() => {
+        return () => {
+            files.forEach((file: any) => URL.revokeObjectURL(file.preview));
+        };
     }, [files]);
 
     return (
@@ -45,7 +52,6 @@ export default observer(function ImageUploadWidget({loading, uploadImage, setFil
                     {files && files.length > 0 &&
                         <ImageWidgetCropper setCropper={setCropper} imagePreview={files[0].preview} />
                     }
-
                 </Grid.Column>
                 <Grid.Column width={1} />
                 <Grid.Column width={4}>
@@ -54,13 +60,13 @@ export default observer(function ImageUploadWidget({loading, uploadImage, setFil
                     {files && files.length > 0 && (
                         <>
                             <Button.Group widths={2}>
-                                <Button loading={loading} onClick={onCrop} positive icon='check' />
-                                <Button disabled={loading} onClick={() => setFiles([])} icon='close' />
+                                <Button type="button" loading={loading} onClick={onCrop} positive icon='check' />
+                                <Button type="button" disabled={loading} onClick={() => setFiles([])} icon='close' />
                             </Button.Group>
                         </>
                     )}
                 </Grid.Column>
             </Grid>
         </>
-    )
-})
+    );
+});

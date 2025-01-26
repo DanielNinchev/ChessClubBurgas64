@@ -13,6 +13,7 @@ export default observer(function AnnouncementImages({ announcement }: Props) {
     const { announcementStore: { uploadImage, uploading, setMainImage, loading, deleteImage } } = useStore();
     const [addImageMode, setAddImageMode] = useState(false);
     const [target, setTarget] = useState('');
+    const [files, setFiles] = useState<Blob[]>([]);
 
     function handleImageUpload(file: any) {
         uploadImage(file).then(() => setAddImageMode(false));
@@ -28,6 +29,9 @@ export default observer(function AnnouncementImages({ announcement }: Props) {
         deleteImage(image);
     }
 
+    function handleSetFiles(files: Blob[]){
+        setFiles(files);
+    }
 
     return (
         <Tab.Pane>
@@ -38,7 +42,7 @@ export default observer(function AnnouncementImages({ announcement }: Props) {
                 </Grid.Column>
                 <Grid.Column width='16'>
                     {addImageMode ? (
-                        <ImageUploadWidget uploadImage={handleImageUpload} loading={uploading} />
+                        <ImageUploadWidget uploadImage={handleImageUpload} loading={uploading} setFiles={handleSetFiles}/>
                     ) : (
                         <Card.Group itemsPerRow={5}>
                             {announcement.images?.map(image => (

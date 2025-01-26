@@ -1,9 +1,7 @@
 ﻿#nullable disable
-using ChessClubBurgas64;
-
-namespace ChessClubBurgas64.Web.DTOs.AccountDTOs
+namespace ChessClubBurgas64.Web.Models.AccountModels
 {
-    public class UserDto
+    public class AccountViewModel
     {
         public string Email { get; set; }
         public string Token { get; set; }

@@ -69,11 +69,13 @@ export default class AnnouncementStore {
         return params;
     }
 
+    get announcements() {
+        return Array.from(this.announcementRegistry.values());
+    }
+
     get groupedAnnouncements() {
         return Object.entries(
-            this.announcementsByDate.reduce((announcements, announcement) => {
-                console.log(announcement.dateCreated)
-                console.log("This is the announcement: ", announcement)
+            this.announcements.reduce((announcements, announcement) => {
                 const date = announcement.dateCreated!.toISOString().split('T')[0];
                 announcements[date] = announcements[date] ? [...announcements[date], announcement] : [announcement];
                 return announcements;
@@ -81,11 +83,11 @@ export default class AnnouncementStore {
         )
     }
 
-    get announcementsByDate() {
-        console.log('Announcements:', Array.from(this.announcementRegistry.values()))
-        return Array.from(this.announcementRegistry.values()).sort((a, b) =>
-            a.dateCreated!.getTime() - b.dateCreated!.getTime());
-    }
+    // get announcementsByDate() {
+    //     console.log('Announcements:', Array.from(this.announcementRegistry.values()))
+    //     return Array.from(this.announcementRegistry.values()).sort((a, b) =>
+    //         a.dateCreated!.getTime() - b.dateCreated!.getTime());
+    // }
 
     loadAnnouncements = async () => {
         this.loadingInitial = true;
@@ -148,13 +150,10 @@ export default class AnnouncementStore {
 
     createAnnouncement = async (announcement: AnnouncementFormValues, file: Blob) => {
         try {
-            const response = await agent.Announcements.create(announcement, file);
-            console.log('Form Data is: ', response)
-            const newAnnouncement = response;
-            console.log('New announcement is:', newAnnouncement)
-            for (const image of response.images) {
+            const newAnnouncement = await agent.Announcements.create(announcement, file);
+            for (const image of newAnnouncement.images) {
                 if (image.isMain) {
-                    store.announcementStore.setImage(image.url);
+                    store.announcementStore.setMainImage(image);
                     announcement.mainImageUrl = image.url;
                     break;
                 }
@@ -167,14 +166,13 @@ export default class AnnouncementStore {
         }
     }
 
-    updateAnnouncement = async (announcement: AnnouncementFormValues) => {
+    updateAnnouncement = async (announcement: AnnouncementFormValues, file: Blob) => {
         try {
-            await agent.Announcements.update(announcement);
+            await agent.Announcements.update(announcement, file);
             runInAction(() => {
                 if (announcement.id) {
-                    let updatedAnnouncement = { ...this.getAnnouncement(announcement.id), ...announcement };
-                    this.announcementRegistry.set(announcement.id, updatedAnnouncement as Announcement);
-                    this.selectedAnnouncement = updatedAnnouncement as Announcement;
+                    this.announcementRegistry.set(announcement.id, announcement as Announcement);
+                    this.selectedAnnouncement = announcement as Announcement;
                 }
             })
         } catch (error) {
@@ -198,35 +196,37 @@ export default class AnnouncementStore {
         }
     }
 
-    uploadImage = async (file: any) => {
-        this.uploading = true;
-        try {
-            const response = await agent.Announcements.uploadImage(file);
-            const image = response.data;
-            runInAction(() => {
-                if (this.selectedAnnouncement) {
-                    this.selectedAnnouncement.images?.push(image);
-                    if (image.isMain && store.userStore.user) {
-                        store.announcementStore.setImage(image.url);
-                        this.selectedAnnouncement.mainImageUrl = image.url;
-                    }
-                }
-                this.uploading = false;
-            })
-        } catch (error) {
-            console.log(error);
-            runInAction(() => this.uploading = false);
-        }
-    }
+    // uploadImage = async (file: any) => {
+    //     this.uploading = true;
+    //     try {
+    //         const response = await agent.Announcements.uploadImage(file);
+    //         const image = response.data;
+    //         runInAction(() => {
+    //             if (this.selectedAnnouncement) {
+    //                 this.selectedAnnouncement.images?.push(image);
+    //                 if (image.isMain && store.userStore.user) {
+    //                     store.announcementStore.setMainImage(image);
+    //                     this.selectedAnnouncement.mainImageUrl = image.url;
+    //                 }
+    //             }
+    //             this.uploading = false;
+    //         })
+    //     } catch (error) {
+    //         console.log(error);
+    //         runInAction(() => this.uploading = false);
+    //     }
+    // }
 
-    setImage = (image: string) => {
-        if (this.selectedAnnouncement) this.selectedAnnouncement.mainImageUrl = image;
+    setImage = (image: Image) => {
+        if (this.selectedAnnouncement)
+        {
+            this.selectedAnnouncement.mainImageUrl = image.url;
+        } 
     }
 
     setMainImage = async (image: Image) => {
         this.loading = true;
         try {
-            await agent.Announcements.setMainImage(image.id);
             runInAction(() => {
                 if (this.selectedAnnouncement && this.selectedAnnouncement.images) {
                     this.selectedAnnouncement.images.find(a => a.isMain)!.isMain = false;
@@ -241,21 +241,21 @@ export default class AnnouncementStore {
         }
     }
 
-    deleteImage = async (image: Image) => {
-        this.loading = true;
-        try {
-            await agent.Announcements.deleteMainImage(image.id);
-            runInAction(() => {
-                if (this.selectedAnnouncement) {
-                    this.selectedAnnouncement.images = this.selectedAnnouncement.images?.filter(a => a.id !== image.id);
-                    this.loading = false;
-                }
-            })
-        } catch (error) {
-            toast.error('Problem deleting photo');
-            this.loading = false;
-        }
-    }
+    // deleteImage = async (image: Image) => {
+    //     this.loading = true;
+    //     try {
+    //         await agent.Announcements.deleteMainImage(image.id);
+    //         runInAction(() => {
+    //             if (this.selectedAnnouncement) {
+    //                 this.selectedAnnouncement.images = this.selectedAnnouncement.images?.filter(a => a.id !== image.id);
+    //                 this.loading = false;
+    //             }
+    //         })
+    //     } catch (error) {
+    //         toast.error('Problem deleting photo');
+    //         this.loading = false;
+    //     }
+    // }
 
     clearSelectedAnnouncement = () => {
         this.selectedAnnouncement = undefined;

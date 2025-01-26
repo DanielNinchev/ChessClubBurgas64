@@ -1,10 +1,9 @@
 ﻿#nullable disable
-
 using ChessClubBurgas64.Data.Models;
 
-namespace ChessClubBurgas64.Web.DTOs.AnnouncementDTOs
+namespace ChessClubBurgas64.Web.Models.AnnouncementModels
 {
-    public class AnnouncementDTO
+    public class AnnouncementInputModel
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

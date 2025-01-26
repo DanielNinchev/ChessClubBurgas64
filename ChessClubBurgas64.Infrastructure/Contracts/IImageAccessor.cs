@@ -5,8 +5,8 @@ namespace ChessClubBurgas64.Infrastructure.Contracts
 {
     public interface IImageAccessor
     {
-        Task<ImageUploadResult?> AddImage(IFormFile file);
+        Task<ImageUploadResult?> AddImageAsync(IFormFile file);
 
-        Task<string?> DeleteImage(string publicId);
+        Task DeleteImageAsync(string publicId);
     }
 }

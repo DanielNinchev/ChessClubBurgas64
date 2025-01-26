@@ -16,6 +16,7 @@ export class AnnouncementFormValues
   description: string = '';
   text: string = '';
   mainImageUrl: string = '';
+  mainImageId?: string = undefined
   
   constructor(announcement?: AnnouncementFormValues) {
     if (announcement) {
