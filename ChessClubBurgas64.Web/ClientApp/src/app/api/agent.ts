@@ -6,8 +6,9 @@ import { PaginatedResult } from '../models/pagination';
 import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
-import { Announcement, AnnouncementFormValues, Image } from '../models/announcement';
+import { Announcement, AnnouncementFormValues } from '../models/announcement';
 import { Profile } from '../models/profile';
+import { Puzzle, PuzzleFormValues } from '../models/puzzle';
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -77,6 +78,12 @@ const requests = {
     del: <T>(url: string) => axios.delete<T>(url).then(responseBody)
 }
 
+const Account = {
+    current: () => requests.get<User>('account'),
+    login: (user: UserFormValues) => requests.post<User>('/account/login', user),
+    register: (user: UserFormValues) => requests.post<User>('/account/register', user)
+}
+
 const Announcements = {
     list: (params: URLSearchParams) => axios.get<PaginatedResult<Announcement[]>>('/announcements', { params }).then(responseBody),
     details: (id: string) => requests.get<Announcement>(`/announcements/${id}`),
@@ -102,15 +109,39 @@ const Announcements = {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
     },
-
     delete: (id: string) => requests.del<void>(`/announcements/${id}`),
-
 }
 
-const Account = {
-    current: () => requests.get<User>('account'),
-    login: (user: UserFormValues) => requests.post<User>('/account/login', user),
-    register: (user: UserFormValues) => requests.post<User>('/account/register', user)
+const Puzzles = {
+    list: (params: URLSearchParams) => axios.get<PaginatedResult<Puzzle[]>>('/puzzles', { params }).then(responseBody),
+    details: (id: number) => requests.get<Puzzle>(`/puzzles/${id}`),
+    create: async (puzzle: PuzzleFormValues, file: Blob) => {
+        let formData = new FormData();
+        formData.append('Title', puzzle.title);
+        formData.append('Description', puzzle.description);
+        formData.append('Solution', puzzle.solution);
+        formData.append('Points', puzzle.points.toString());
+        formData.append('Difficulty', puzzle.difficulty);
+        formData.append('Image', file);
+        const response = await axios.post('/puzzles', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return responseBody(response);
+    },
+    update: async (puzzle: PuzzleFormValues, file: Blob) => {
+        let formData = new FormData();
+        formData.append('Title', puzzle.title);
+        formData.append('Description', puzzle.description);
+        formData.append('Solution', puzzle.solution);
+        formData.append('Points', puzzle.points.toString());
+        formData.append('Difficulty', puzzle.difficulty);
+        formData.append('Image', file);
+
+        await axios.put(`/puzzles/${puzzle.id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
+    delete: (id: number) => requests.del<void>(`/puzzles/${id}`),
 }
 
 const Profiles = {
@@ -121,7 +152,12 @@ const Profiles = {
 const agent = {
     Announcements,
     Account,
+    Puzzles,
     Profiles
+}
+
+function populateFormValues(){
+
 }
 
 export default agent;

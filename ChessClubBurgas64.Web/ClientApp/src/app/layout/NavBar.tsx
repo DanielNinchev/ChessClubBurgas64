@@ -15,19 +15,29 @@ export default observer(function NavBar() {
                     Начало
                 </Menu.Item>
                 <Menu.Item as={NavLink} icon='newspaper' to='/announcements' name='Новини' />
-                <Menu.Item as={NavLink} icon='users' to='/activities' name='Ръководство' />
-                <Menu.Item as={NavLink} icon='chess board' to='/activities' name='Състезатели' />
+                <Menu.Item as={NavLink} icon='chess' to='/activities' name='За нас' />
                 <Menu.Item as={NavLink} icon='book' to='/activities' name='История' />
                 <Menu.Item as={NavLink} icon='phone' to='/activities' name='Контакти' />
 
                 <Menu.Item position='right'>
                     {isLoggedIn ? (
-                        <Dropdown pointing='top left' text={user?.firstName}>
+                        <Dropdown
+                            button
+                            className='icon'
+                            floating
+                            labeled
+                            icon='settings'
+                            search
+                            text={user?.isAdmin ? 'Администратор' : user?.firstName}>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to={`/profiles/${user?.firstName}`} text='Профил' icon='user circle' />
+                                <Dropdown.Item as={Link} to={`/puzzles`} text='Задачи' icon='chess board' />
                                 <Dropdown.Item onClick={logout} text='Изход' icon='power' />
-                            </Dropdown.Menu>
+                            </Dropdown.Menu>    
                         </Dropdown>
+                        // <Dropdown pointing='top left' icon='settings' text={user?.isAdmin ? 'Администратор' : user?.firstName}>
+
+                        // </Dropdown>
                     ) : (
                         <Menu inverted>
                             <Menu.Item as={NavLink} icon= 'user' name='Вход' onClick={() => modalStore.openModal(<LoginForm />)}/>

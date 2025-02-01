@@ -8,7 +8,7 @@ namespace ChessClubBurgas64.Web.Services.Contracts
     public interface IAnnouncementsService
     {
         Task<AnnouncementInputModel?> GetAnnouncementAsync(Guid id);
-        Task<PagedList<Announcement, AnnouncementInputModel>?> GetAnnouncementAsync(AnnouncementParams pagingParams);
+        Task<PagedList<Announcement, AnnouncementInputModel>?> GetAnnouncementsAsync(AnnouncementParams pagingParams);
         Task<AnnouncementInputModel> CreateAnnouncementAsync(Announcement announcement, IFormFile mainImage);
         Task DeleteAnnouncementAsync(Guid id);
         Task UpdateAnnouncementAsync(Guid id, Announcement updatedAnnouncement, IFormFile mainImage);

@@ -20,4 +20,8 @@
 	<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChessClubBurgas64.Common\ChessClubBurgas64.Common.csproj" />
+  </ItemGroup>
+
 </Project>

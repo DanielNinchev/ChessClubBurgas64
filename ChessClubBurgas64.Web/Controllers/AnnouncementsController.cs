@@ -19,7 +19,7 @@ namespace ChessClubBurgas64.Controllers
         [HttpGet]
         public async Task<IResult> GetAnnouncements([FromQuery] AnnouncementParams pagingParams)
         {
-            var pagedResult = await _announcementsService.GetAnnouncementAsync(pagingParams);
+            var pagedResult = await _announcementsService.GetAnnouncementsAsync(pagingParams);
             if (pagedResult == null)
             {
                 return Results.NotFound();

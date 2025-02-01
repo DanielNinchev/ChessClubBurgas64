@@ -76,6 +76,7 @@ namespace ChessClubBurgas64.Web.Extensions
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IImageAccessor, ImageAccessor>();
             services.AddTransient<IAnnouncementsService, AnnouncementsService>();
+            services.AddTransient<IPuzzlesService, PuzzlesService>();
             //services.AddSignalR();
 
             return services;

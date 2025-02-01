@@ -17,7 +17,7 @@ namespace ChessClubBurgas64.Web.Services
         private readonly IMapper _mapper = mapper;
         private readonly IImageAccessor _imageAccessor = imageAccessor;
 
-        public async Task<PagedList<Announcement, AnnouncementInputModel>?> GetAnnouncementAsync(AnnouncementParams pagingParams)
+        public async Task<PagedList<Announcement, AnnouncementInputModel>?> GetAnnouncementsAsync(AnnouncementParams pagingParams)
         {
             if (_dbContext.Announcements == null)
             {
@@ -26,11 +26,11 @@ namespace ChessClubBurgas64.Web.Services
 
             var query = _dbContext.Announcements
                 .Include(a => a.Images)
-                .Where(x => x.DateCreated.Day <= pagingParams.StartDate.Day)
+                .Where(x => x.DateCreated <= pagingParams.StartDate)
                 .OrderByDescending(d => d.DateCreated)
                 .AsQueryable();
 
-            return await PagedList<Announcement, AnnouncementInputModel>.CreateAsync(query, pagingParams.PageNumber, pagingParams.PageSize, mapper);
+            return await PagedList<Announcement, AnnouncementInputModel>.CreateAsync(query, pagingParams.PageNumber, pagingParams.PageSize, _mapper);
         }
 
         public async Task<AnnouncementInputModel?> GetAnnouncementAsync(Guid id)

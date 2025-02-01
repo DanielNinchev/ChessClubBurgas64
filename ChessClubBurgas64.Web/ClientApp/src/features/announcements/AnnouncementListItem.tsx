@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { bg } from 'date-fns/locale';
 import { Link } from "react-router-dom";
-import { Item, Button, Icon, Segment, Container, Divider, ModalHeader, ModalContent, ModalActions, Modal } from "semantic-ui-react";
+import { Item, Button, Icon, Segment, Container, Divider } from "semantic-ui-react";
 import { Announcement } from "../../app/models/announcement";
 import { observer } from "mobx-react-lite";
 import { useStore } from '../../app/stores/store';
@@ -34,7 +34,7 @@ function reduceState(state: State, action: Action) {
 }
 
 export default observer(function AnnouncementListItem({ announcement }: Props) {
-    const { announcementStore: { updateAnnouncement, deleteAnnouncement}, userStore: {user} } = useStore();
+    const { announcementStore: { deleteAnnouncement}, userStore: {user} } = useStore();
     const [state, dispatch] = React.useReducer(reduceState, {
         open: false,
         dimmer: undefined,
