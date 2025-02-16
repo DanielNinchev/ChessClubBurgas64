@@ -2,6 +2,7 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ImageUploadResult = ChessClubBurgas64.Infrastructure.Images.ImageUploadResult;
 
@@ -10,8 +11,9 @@ namespace Infrastructure.Images
     public class ImageAccessor : IImageAccessor
     {
         private readonly Cloudinary _cloudinary;
+        private readonly ILogger<ImageAccessor> _logger;
 
-        public ImageAccessor(IOptions<CloudinarySettings> config)
+        public ImageAccessor(IOptions<CloudinarySettings> config, ILogger<ImageAccessor> logger)
         {
             var account = new Account(
                 config.Value.CloudName,
@@ -19,9 +21,10 @@ namespace Infrastructure.Images
                 config.Value.ApiSecret
             );
             _cloudinary = new Cloudinary(account);
+            _logger = logger;
         }
 
-        public async Task<ImageUploadResult?> AddImage(IFormFile file)
+        public async Task<ImageUploadResult?> AddImageAsync(IFormFile file)
         {
             if (file != null && file.Length > 0)
             {
@@ -33,10 +36,9 @@ namespace Infrastructure.Images
                 };
 
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
                 if (uploadResult.Error != null)
                 {
-                    throw new Exception(uploadResult.Error.Message);
+                    _logger.LogError($"Error uploading imageto Cloudinary. Error message: {uploadResult.Error.Message}");
                 }
 
                 return new ImageUploadResult
@@ -49,11 +51,14 @@ namespace Infrastructure.Images
             return null;
         }
 
-        public async Task<string?> DeleteImage(string publicId)
+        public async Task DeleteImageAsync(string publicId)
         {
             var deleteParams = new DeletionParams(publicId);
-            var result = await _cloudinary.DestroyAsync(deleteParams);
-            return result.Result == "ok" ? result.Result : null;
+            var response = await _cloudinary.DestroyAsync(deleteParams);
+            if (response.Result != "ok")
+            {
+                _logger.LogError($"Error deleting image with publicId {publicId} from Cloudinary.");
+            }
         }
     }
 }

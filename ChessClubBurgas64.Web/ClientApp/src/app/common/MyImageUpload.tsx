@@ -8,16 +8,17 @@ interface Props {
     loading: boolean;
     uploadImage: (file: Blob) => void;
     setFiles: (files: Blob[]) => void;
+    initialImage?: string;
 }
 
-const MyImageUpload = ({ name, label, loading, uploadImage, setFiles }: Props) => {
+const MyImageUpload = ({ name, label, loading, uploadImage, setFiles, initialImage }: Props) => {
     const [field, meta, helpers] = useField(name);
     const { setValue } = helpers;
     const { values } = useFormikContext<any>();
 
     useEffect(() => {
         setValue(values.files);
-    }, [values.files, setValue]);
+    }, [initialImage, values.files, setValue]);
 
     return (
         <div>
@@ -30,6 +31,7 @@ const MyImageUpload = ({ name, label, loading, uploadImage, setFiles }: Props) =
                     setValue([file]);
                 }} 
                 setFiles={setFiles} 
+                initialImage={initialImage}
             />
             {meta.touched && meta.error ? (
                 <div className="error">{meta.error}</div>

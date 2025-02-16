@@ -2,14 +2,15 @@ import React, { useEffect, useRef } from 'react';
 import { useField } from 'formik';
 import 'suneditor/dist/css/suneditor.min.css';
 import suneditor from 'suneditor';
-import {align, font, fontColor, fontSize, hiliteColor, image, link, list, video} from 'suneditor/src/plugins'
+import { align, font, fontColor, fontSize, hiliteColor, image, link, list, video } from 'suneditor/src/plugins';
 
 interface Props {
     name: string;
     label?: string;
+    initialValue?: string;
 }
 
-const MySunEditor: React.FC<Props> = ({ label, ...props }) => {
+const MySunEditor: React.FC<Props> = ({ label, initialValue, ...props }) => {
     const [field, meta, helpers] = useField(props);
     const editorRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +23,11 @@ const MySunEditor: React.FC<Props> = ({ label, ...props }) => {
             ],
         });
 
+        // Set initial content if initialValue is provided
+        if (initialValue) {
+            editor.setContents(initialValue);
+        }
+
         editor.onChange = (contents: string) => {
             helpers.setValue(contents);
         };
@@ -29,7 +35,7 @@ const MySunEditor: React.FC<Props> = ({ label, ...props }) => {
         return () => {
             editor.destroy();
         };
-    }, [helpers]);
+    }, [initialValue, helpers]);
 
     return (
         <div>

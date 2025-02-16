@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ChessClubBurgas64.Data.Models;
-using ChessClubBurgas64.Web.DTOs.AccountDTOs;
+using ChessClubBurgas64.Web.Models.AccountModels;
 using ChessClubBurgas64.Web.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +20,7 @@ namespace ChessClubBurgas64.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+        public async Task<ActionResult<AccountViewModel>> Login(LoginInputModel loginDto)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email);
             if (user is null)
@@ -39,7 +39,7 @@ namespace ChessClubBurgas64.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
+        public async Task<ActionResult<AccountViewModel>> Register(RegisterInputModel registerDto)
         {
             try
             {
@@ -68,16 +68,16 @@ namespace ChessClubBurgas64.Web.Controllers
 
         [Authorize("IsChessClubAdmin")]
         [HttpGet]
-        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        public async Task<ActionResult<AccountViewModel>> GetCurrentUser()
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
 
             return CreateUserObject(user);
         }
 
-        private UserDto CreateUserObject(Account user)
+        private AccountViewModel CreateUserObject(Account user)
         {
-            var userDto = _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<AccountViewModel>(user);
             userDto.Token = _tokenService.CreateToken(user);
             return userDto;
         }

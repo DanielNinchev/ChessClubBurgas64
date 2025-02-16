@@ -1,3 +1,5 @@
+import {Image} from "./image"
+
 export interface Announcement {
     id: string;
     title: string;
@@ -16,6 +18,7 @@ export class AnnouncementFormValues
   description: string = '';
   text: string = '';
   mainImageUrl: string = '';
+  mainImageId?: string = undefined
   
   constructor(announcement?: AnnouncementFormValues) {
     if (announcement) {
@@ -32,10 +35,4 @@ export class Announcement implements Announcement {
   constructor(init?: AnnouncementFormValues) {
     Object.assign(this, init);
   }
-}
-
-export interface Image {
-  id: string;
-  url: string;
-  isMain: boolean;
 }
