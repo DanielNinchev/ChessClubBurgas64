@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { bg } from 'date-fns/locale';
 import { Link } from "react-router-dom";
-import { Item, Button, Icon, Segment, Container, Divider } from "semantic-ui-react";
+import { Item, Button, Icon, Segment, Container, Divider, Grid } from "semantic-ui-react";
 import { Announcement } from "../../app/models/announcement";
 import { observer } from "mobx-react-lite";
 import { useStore } from '../../app/stores/store';
@@ -49,13 +49,18 @@ export default observer(function AnnouncementListItem({ announcement }: Props) {
             <Segment>
                 <Item.Group>
                     <Item>
-                        <Item.Image style={{marginBottom: 5}} size='large' 
-                            src={announcement.mainImageUrl} />
-                        <Item.Content>
-                            <Item.Header as={Link} to={`/announcements/${announcement.id}`}>
-                                {announcement.title}
-                            </Item.Header>
-                        </Item.Content>
+                        <Grid>
+                            <Grid.Column width='4'>
+                                <Item.Image style={{marginBottom: 5}} size='small' src={announcement.mainImageUrl} />
+                            </Grid.Column>
+                            <Grid.Column width='6'>
+                                <Item.Content>
+                                    <Item.Header as={Link} to={`/announcements/${announcement.id}`}>
+                                        {announcement.title}
+                                    </Item.Header>
+                                </Item.Content>
+                            </Grid.Column>
+                        </Grid>
                     </Item>
                 </Item.Group>
             </Segment>

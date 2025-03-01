@@ -17,7 +17,7 @@ export default observer(function NavBar() {
                 <Menu.Item as={NavLink} icon='newspaper' to='/announcements' name='Новини' />
                 <Menu.Item as={NavLink} icon='chess' to='/activities' name='За нас' />
                 <Menu.Item as={NavLink} icon='book' to='/activities' name='История' />
-                <Menu.Item as={NavLink} icon='phone' to='/activities' name='Контакти' />
+                <Menu.Item as={NavLink} icon='phone' to='/contacts' name='Контакти' />
 
                 <Menu.Item position='right'>
                     {isLoggedIn ? (
