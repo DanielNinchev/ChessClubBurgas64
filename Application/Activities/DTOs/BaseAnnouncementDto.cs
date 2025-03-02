@@ -1,8 +1,6 @@
-using System;
-
 namespace Application.Activities.DTOs;
 
-public class BaseActivityDto
+public class BaseAnnouncementDto
 {
     public string Title { get; set; } = "";
     public DateTime Date { get; set; }

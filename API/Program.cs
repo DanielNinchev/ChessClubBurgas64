@@ -1,5 +1,4 @@
 using API.Middleware;
-using API.SignalR;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
@@ -26,12 +25,11 @@ builder.Services.AddControllers(opt =>
 });
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    //opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddCors();
-builder.Services.AddSignalR();
 builder.Services.AddMediatR(x => {
-    x.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
+    x.RegisterServicesFromAssemblyContaining<GetAnnouncementList.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 builder.Services.AddHttpClient<ResendClient>();
@@ -40,36 +38,35 @@ builder.Services.Configure<ResendClientOptions>(opt =>
     opt.ApiToken = builder.Configuration["Resend:ApiToken"]!;
 });
 builder.Services.AddTransient<IResend, ResendClient>();
-builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
+builder.Services.AddTransient<IEmailSender<Account>, EmailSender>();
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
-builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateAnnouncementValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
-builder.Services.AddIdentityApiEndpoints<User>(opt => 
+builder.Services.AddIdentityApiEndpoints<Account>(opt => 
 {
     opt.User.RequireUniqueEmail = true;
     opt.SignIn.RequireConfirmedEmail = true;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
-builder.Services.AddAuthorization(opt =>
-{
-    opt.AddPolicy("IsActivityHost", policy => 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("IsChessClubAdmin", policy => 
     {
         policy.Requirements.Add(new IsHostRequirement());
     });
-});
+
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
-builder.Services.Configure<CloudinarySettings>(builder.Configuration
-    .GetSection("CloudinarySettings"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+app.UseCors(x => x.AllowAnyHeader()
+    .AllowAnyMethod()
     .AllowCredentials()
     .WithOrigins("http://localhost:3000", "https://localhost:3000"));
 
@@ -80,8 +77,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
-app.MapGroup("api").MapIdentityApi<User>(); // api/login
-app.MapHub<CommentHub>("/comments");
+app.MapGroup("api").MapIdentityApi<Account>(); // api/login
 app.MapFallbackToController("Index", "Fallback");
 
 using var scope = app.Services.CreateScope();
@@ -90,9 +86,8 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<AppDbContext>();
-    var userManager = services.GetRequiredService<UserManager<User>>();
+    var userManager = services.GetRequiredService<UserManager<Account>>();
     await context.Database.MigrateAsync();
-    await DbInitializer.SeedData(context, userManager);
 }
 catch (Exception ex)
 {

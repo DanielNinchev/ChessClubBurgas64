@@ -1,20 +1,18 @@
-using System;
 using Application.Activities.DTOs;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
 using Domain;
-using FluentValidation;
 using MediatR;
 using Persistence;
 
 namespace Application.Activities.Commands;
 
-public class CreateActivity
+public class CreateAnnouncement
 {
     public class Command : IRequest<Result<string>>
     {
-        public required CreateActivityDto ActivityDto { get; set; }
+        public required CreateAnnouncementDto AnnouncementDto { get; set; }
     }
 
     public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) 
@@ -24,11 +22,11 @@ public class CreateActivity
         {
             var user = await userAccessor.GetUserAsync();
 
-            var activity = mapper.Map<Activity>(request.ActivityDto);
+            var activity = mapper.Map<Announcement>(request.AnnouncementDto);
 
-            context.Activities.Add(activity);
+            context.Announcements.Add(activity);
 
-            var attendee = new ActivityAttendee
+            var attendee = new Student
             {
                 ActivityId = activity.Id,
                 UserId = user.Id,

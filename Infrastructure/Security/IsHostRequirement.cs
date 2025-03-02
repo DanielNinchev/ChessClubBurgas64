@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,8 +11,7 @@ public class IsHostRequirement : IAuthorizationRequirement
 {
 }
 
-public class IsHostRequirementHandler(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor) 
-    : AuthorizationHandler<IsHostRequirement>
+public class IsHostRequirementHandler(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor) : AuthorizationHandler<IsHostRequirement>
 {
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, IsHostRequirement requirement)
     {
@@ -24,12 +22,12 @@ public class IsHostRequirementHandler(AppDbContext dbContext, IHttpContextAccess
 
         if (httpContext?.GetRouteValue("id") is not string activityId) return;
 
-        var attendee = await dbContext.ActivityAttendees
+        var account = await dbContext.Accounts
             .AsNoTracking()
-            .SingleOrDefaultAsync(x => x.UserId == userId && x.ActivityId == activityId);
+            .SingleOrDefaultAsync(x => x.Id == userId && x.IsAdmin);
         
-        if (attendee == null) return;
+        if (account == null) return;
 
-        if (attendee.IsHost) context.Succeed(requirement);
+        context.Succeed(requirement);
     }
 }
