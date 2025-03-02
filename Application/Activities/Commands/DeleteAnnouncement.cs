@@ -1,11 +1,10 @@
-using System;
 using Application.Core;
 using MediatR;
 using Persistence;
 
 namespace Application.Activities.Commands;
 
-public class DeleteActivity
+public class DeleteAnnouncement
 {
     public class Command : IRequest<Result<Unit>>
     {
@@ -16,16 +15,16 @@ public class DeleteActivity
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var activity = await context.Activities
+            var activity = await context.Announcements
                 .FindAsync([request.Id], cancellationToken);
 
-            if (activity == null) return Result<Unit>.Failure("Activity not found", 404);
+            if (activity == null) return Result<Unit>.Failure("Announcement not found", 404);
 
             context.Remove(activity);
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
-            if (!result) return Result<Unit>.Failure("Failed to delete the activity", 400);
+            if (!result) return Result<Unit>.Failure("Failed to delete the announcement", 400);
 
             return Result<Unit>.Success(Unit.Value);
         }

@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.DTOs;
@@ -6,7 +5,13 @@ namespace API.DTOs;
 public class RegisterDto
 {
     [Required]
-    public string DisplayName { get; set; } = "";
+    public string FirstName { get; set; } = "";
+
+    [Required]
+    public string MiddleName { get; set; } = "";
+
+    [Required]
+    public string LastName { get; set; } = "";
 
     [Required]
     [EmailAddress]

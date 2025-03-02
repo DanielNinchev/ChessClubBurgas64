@@ -11,26 +11,26 @@ using Persistence;
 
 namespace Application.Activities.Queries;
 
-public class GetActivityDetails
+public class GetAnnouncementDetails
 {
-    public class Query : IRequest<Result<ActivityDto>>
+    public class Query : IRequest<Result<AnnouncementDto>>
     {
         public required string Id { get; set; }
     }
 
     public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) 
-        : IRequestHandler<Query, Result<ActivityDto>>
+        : IRequestHandler<Query, Result<AnnouncementDto>>
     {
-        public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<AnnouncementDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var activity = await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider, 
+            var activity = await context.Announcements
+                .ProjectTo<AnnouncementDto>(mapper.ConfigurationProvider, 
                     new {currentUserId = userAccessor.GetUserId()})
                 .FirstOrDefaultAsync(x => request.Id == x.Id, cancellationToken);
 
-            if (activity == null) return Result<ActivityDto>.Failure("Activity not found", 404);
+            if (activity == null) return Result<AnnouncementDto>.Failure("Activity not found", 404);
 
-            return Result<ActivityDto>.Success(activity);
+            return Result<AnnouncementDto>.Success(activity);
         }
     }
 }

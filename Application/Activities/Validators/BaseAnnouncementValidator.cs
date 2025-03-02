@@ -1,13 +1,12 @@
-using System;
 using Application.Activities.DTOs;
 using FluentValidation;
 
 namespace Application.Activities.Validators;
 
-public class BaseActivityValidator<T, TDto> : AbstractValidator<T> where TDto 
-    : BaseActivityDto
+public class BaseAnnouncementValidator<T, TDto> : AbstractValidator<T> where TDto 
+    : BaseAnnouncementDto
 {
-    public BaseActivityValidator(Func<T, TDto> selector)
+    public BaseAnnouncementValidator(Func<T, TDto> selector)
     {
         RuleFor(x => selector(x).Title)
             .NotEmpty().WithMessage("Title is required")

@@ -1,4 +1,3 @@
-using System;
 using Application.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -22,14 +21,14 @@ public class PhotoService : IPhotoService
         _cloudinary = new Cloudinary(account);
     }
 
-    public async Task<DeletionResult> DeletePhoto(string publicId)
+    public async Task<DeletionResult> DeletePhotoAsync(string publicId)
     {
         var deleteParams = new DeletionParams(publicId);
 
         return await _cloudinary.DestroyAsync(deleteParams);
     }
 
-    public async Task<UploadResult?> UploadPhoto(IFormFile file)
+    public async Task<UploadResult?> UploadPhotoAsync(IFormFile file)
     {
         if (file.Length <= 0) return null;
 
@@ -38,7 +37,7 @@ public class PhotoService : IPhotoService
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(file.FileName, stream),
-            Folder = "Reactivities2025"
+            Folder = "ChessBurgas64"
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);

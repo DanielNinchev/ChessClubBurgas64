@@ -1,4 +1,3 @@
-using System;
 using Application.Core;
 using Application.Interfaces;
 using Domain;
@@ -20,7 +19,7 @@ public class AddPhoto
     {
         public async Task<Result<Photo>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var uploadResult = await photoService.UploadPhoto(request.File);
+            var uploadResult = await photoService.UploadPhotoAsync(request.File);
 
             if (uploadResult == null) return Result<Photo>.Failure("Failed to upload photo", 400);
             if (uploadResult.Error != null) return Result<Photo>.Failure(uploadResult.Error.Message, 400);

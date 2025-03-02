@@ -1,6 +1,3 @@
-using System;
-using System.Text.Json.Serialization;
-
 namespace Domain;
 
 public class Photo
@@ -9,9 +6,9 @@ public class Photo
     public required string Url { get; set; }
     public required string PublicId { get; set; }
 
-    // nav properties
-    public required string UserId { get; set; }
-
-    [JsonIgnore]
-    public User User { get; set; } = null!;
+    // Navigation properties
+    public required string PuzzleId { get; set; }
+    public virtual Puzzle Puzzle { get; set; } = null!;
+    public required string AnnouncementId { get; set; }
+    public virtual Announcement Announcement { get; set; } = null!;
 }
