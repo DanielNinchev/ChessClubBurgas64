@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import { Button, Container, Divider, Grid, Header, Icon, Segment } from "semantic-ui-react"
+import { Button, Divider, Grid, Header, Icon, Segment } from "semantic-ui-react"
 import NavBar from "../../app/layout/NavBar"
 
 export default observer(function ContactsPage() {
