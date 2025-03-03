@@ -7,8 +7,8 @@ public class Photo
     public required string PublicId { get; set; }
 
     // Navigation properties
-    public required string PuzzleId { get; set; }
+    public string? PuzzleId { get; set; }
     public virtual Puzzle Puzzle { get; set; } = null!;
-    public required string AnnouncementId { get; set; }
+    public string? AnnouncementId { get; set; }
     public virtual Announcement Announcement { get; set; } = null!;
 }

@@ -2,6 +2,7 @@ using Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Reflection.Emit;
 
 namespace Persistence;
 
@@ -9,6 +10,8 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<Account>
 {
     public required DbSet<Account> Accounts { get; set; }
     public required DbSet<Announcement> Announcements { get; set; }
+    public required DbSet<Lesson> Lessons { get; set; }
+    public required DbSet<LessonStudent> LessonStudents { get; set; }
     public required DbSet<Photo> Photos { get; set; }
     public required DbSet<Puzzle> Puzzles { get; set; }
     public required DbSet<Student> Students { get; set; }
@@ -17,11 +20,11 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<Account>
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Student>(x => x.HasKey(a => new { a.AccountId }));
-        builder.Entity<Announcement>()
-            .HasMany(x => x.Photos)
-            .WithOne(x => x.Announcement)
-            .HasForeignKey(x => x.AnnouncementId);
+        builder.Entity<LessonStudent>().HasNoKey();
+        builder.Entity<Puzzle>()
+               .HasOne(p => p.Photo)
+               .WithOne(ph => ph.Puzzle)
+               .HasForeignKey<Puzzle>(i => i.PhotoId);
 
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),

@@ -1,5 +1,7 @@
 using Application.Core;
 using Application.Interfaces;
+using Application.Profiles.DTOs;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -10,19 +12,15 @@ public class EditProfile
 {
     public class Command : IRequest<Result<Unit>>
     {
-        public string DisplayName { get; set; } = string.Empty;
-        public string Bio { get; set; } = string.Empty;
+        public required ProfileDto ProfileData { get; set; }
     }
 
-    public class Handler(AppDbContext context, IUserAccessor userAccessor) : IRequestHandler<Command, Result<Unit>>
+    public class Handler(AppDbContext context, IUserAccessor userAccessor, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             var user = await userAccessor.GetUserAsync();
-
-            user.DisplayName = request.DisplayName;
-            user.Bio = request.Bio;
-
+            user = mapper.Map(request.ProfileData, user);
             context.Entry(user).State = EntityState.Modified;
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;

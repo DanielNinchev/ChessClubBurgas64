@@ -4,7 +4,7 @@ namespace Domain
 {
     public class Puzzle
     {
-        public int Id { get; set; }
+        public required string Id { get; set; } = Guid.NewGuid().ToString();
         public int Number { get; set; }
         public int Points { get; set; }
         public required string Description { get; set; }
