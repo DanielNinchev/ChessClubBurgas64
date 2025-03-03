@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Resend" Version="0.0.12" />
+    <PackageReference Include="Resend" Version="0.0.13" />
   </ItemGroup>
 
 </Project>

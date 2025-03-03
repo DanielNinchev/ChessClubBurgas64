@@ -2,7 +2,7 @@ namespace Domain;
 
 public class Student
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public DateTime BirthDate { get; set; }
     public string? Address { get; set; }
     public string? School { get; set; }
@@ -13,6 +13,6 @@ public class Student
     public static DateTime Date { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
-    public Guid AccountId { get; set; }
+    public required string AccountId { get; set; }
     public virtual required Account Account { get; set; }
 }
