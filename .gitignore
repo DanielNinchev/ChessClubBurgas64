@@ -487,3 +487,5 @@ API/reactivities.db
 API/reactivities.db-shm
 .gitignore
 /API/appsettings.Development.json
+/ChessClubBurgas64.Web/appsettings.Development.json
+/ChessClubBurgas64.Web/Properties/launchSettings.json
