@@ -1,4 +1,4 @@
-using Application.Activities.DTOs;
+using Application.Announcements.DTOs;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
@@ -6,7 +6,7 @@ using Domain;
 using MediatR;
 using Persistence;
 
-namespace Application.Activities.Commands;
+namespace Application.Announcements.Commands;
 
 public class CreateAnnouncement
 {
@@ -20,26 +20,24 @@ public class CreateAnnouncement
     {
         public async Task<Result<string>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await userAccessor.GetUserAsync();
+            var announcement = mapper.Map<Announcement>(request.AnnouncementDto);
 
-            var activity = mapper.Map<Announcement>(request.AnnouncementDto);
+            context.Announcements.Add(announcement);
 
-            context.Announcements.Add(activity);
+            //var attendee = new Student
+            //{
+            //    ActivityId = announcement.Id,
+            //    UserId = user.Id,
+            //    IsHost = true
+            //};
 
-            var attendee = new Student
-            {
-                ActivityId = activity.Id,
-                UserId = user.Id,
-                IsHost = true
-            };
-
-            activity.Attendees.Add(attendee);
+            //announcement.Attendees.Add(attendee);
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
             if (!result) return Result<string>.Failure("Failed to create the activity", 400);
 
-            return Result<string>.Success(activity.Id);
+            return Result<string>.Success(announcement.Id);
         }
     }
 }

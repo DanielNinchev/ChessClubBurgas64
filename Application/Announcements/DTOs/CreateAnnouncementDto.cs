@@ -1,4 +1,4 @@
-namespace Application.Activities.DTOs;
+namespace Application.Announcements.DTOs;
 
 public class CreateAnnouncementDto : BaseAnnouncementDto
 {

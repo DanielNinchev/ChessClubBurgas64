@@ -1,15 +1,13 @@
-using System;
-using Application.Activities.DTOs;
+using Application.Announcements.DTOs;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
-namespace Application.Activities.Queries;
+namespace Application.Announcements.Queries;
 
 public class GetAnnouncementDetails
 {

@@ -1,7 +1,7 @@
-using Application.Activities.Commands;
-using Application.Activities.DTOs;
+using Application.Announcements.Commands;
+using Application.Announcements.DTOs;
 
-namespace Application.Activities.Validators;
+namespace Application.Announcements.Validators;
 
 public class CreateAnnouncementValidator : BaseAnnouncementValidator<CreateAnnouncement.Command, CreateAnnouncementDto>
 {

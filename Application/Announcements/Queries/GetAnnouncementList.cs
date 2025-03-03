@@ -1,4 +1,4 @@
-using Application.Activities.DTOs;
+using Application.Announcements.DTOs;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
-namespace Application.Activities.Queries;
+namespace Application.Announcements.Queries;
 
 public class GetAnnouncementList
 {

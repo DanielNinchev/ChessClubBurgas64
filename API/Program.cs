@@ -1,6 +1,6 @@
 using API.Middleware;
-using Application.Activities.Queries;
-using Application.Activities.Validators;
+using Application.Announcements.Queries;
+using Application.Announcements.Validators;
 using Application.Core;
 using Application.Interfaces;
 using Domain;
@@ -55,10 +55,10 @@ builder.Services.AddIdentityApiEndpoints<Account>(opt =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("IsChessClubAdmin", policy => 
     {
-        policy.Requirements.Add(new IsHostRequirement());
+        policy.Requirements.Add(new IsChessClubAdminRequirement());
     });
 
-builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+builder.Services.AddTransient<IAuthorizationHandler, IsChessClubAdminRequirementHandler>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 var app = builder.Build();

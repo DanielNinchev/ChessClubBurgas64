@@ -1,6 +1,6 @@
-using Application.Activities.Commands;
-using Application.Activities.DTOs;
-using Application.Activities.Queries;
+using Application.Announcements.Commands;
+using Application.Announcements.DTOs;
+using Application.Announcements.Queries;
 using Application.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

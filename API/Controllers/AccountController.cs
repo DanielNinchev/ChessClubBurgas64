@@ -1,5 +1,3 @@
-using System;
-using System.Net.Http.Headers;
 using System.Text;
 using API.DTOs;
 using Domain;
@@ -8,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using static API.DTOs.GitHubInfo;
 
 namespace API.Controllers;
 
