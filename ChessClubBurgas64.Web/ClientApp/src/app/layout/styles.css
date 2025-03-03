@@ -10,6 +10,10 @@ body {
   background-position: center; /* Centers the image */
 }
 
+body, .ui {
+  font-family: 'Basil-Regular', sans-serif !important;
+}
+
 *, #login-profile, #home-title {
   font-family: 'Basil-Regular';
 }

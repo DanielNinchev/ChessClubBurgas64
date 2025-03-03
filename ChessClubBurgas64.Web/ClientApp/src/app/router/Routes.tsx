@@ -9,6 +9,7 @@ import ProfilePage from "../profiles/ProfilePage";
 import RequireAuth from "./RequireAuth";
 import PuzzleForm from "../../features/puzzles/PuzzleForm";
 import PuzzleDashboard from "../../features/puzzles/PuzzleDashboard";
+import Contacts from "../../features/common/Contacts";
 
 export const routes: RouteObject[] = [
     {
@@ -28,11 +29,13 @@ export const routes: RouteObject[] = [
             {path: 'announcements/update/:id', element: <AnnouncementForm key='update' />},
             {path: 'announcements/:id', element: <AnnouncementDetails />},
 
+            {path: 'contacts', element: <Contacts />},
+
             {path: 'puzzles', element: <PuzzleDashboard />},
             {path: 'puzzles/create', element: <PuzzleForm key='create' />},
             {path: 'puzzles/update/:id', element: <PuzzleForm key='update' />},
             //{path: 'puzzles/:id', element: <AnnouncementDetails />},
-
+            
             {path: 'not-found', element: <NotFound />},
             {path: 'server-error', element: <ServerError />},
             {path: '*', element: <Navigate replace to='/not-found' />},
