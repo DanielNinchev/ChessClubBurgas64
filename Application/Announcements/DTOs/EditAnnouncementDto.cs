@@ -1,6 +1,6 @@
 using System;
 
-namespace Application.Activities.DTOs;
+namespace Application.Announcements.DTOs;
 
 public class EditAnnouncementDto : BaseActivityDto
 {

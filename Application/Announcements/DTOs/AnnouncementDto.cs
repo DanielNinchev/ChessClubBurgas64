@@ -1,6 +1,6 @@
 using Application.Profiles.DTOs;
 
-namespace Application.Activities.DTOs;
+namespace Application.Announcements.DTOs;
 
 public class AnnouncementDto
 {

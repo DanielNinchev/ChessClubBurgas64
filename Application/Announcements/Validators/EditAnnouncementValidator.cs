@@ -1,8 +1,8 @@
-using Application.Activities.Commands;
-using Application.Activities.DTOs;
+using Application.Announcements.Commands;
+using Application.Announcements.DTOs;
 using FluentValidation;
 
-namespace Application.Activities.Validators;
+namespace Application.Announcements.Validators;
 
 public class EditAnnouncementValidator : BaseAnnouncementValidator<EditAnnouncement.Command, EditAnnouncementDto>
 {

@@ -2,7 +2,7 @@ using Application.Core;
 using MediatR;
 using Persistence;
 
-namespace Application.Activities.Commands;
+namespace Application.Announcements.Commands;
 
 public class DeleteAnnouncement
 {

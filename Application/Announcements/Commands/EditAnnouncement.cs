@@ -1,10 +1,10 @@
-using Application.Activities.DTOs;
+using Application.Announcements.DTOs;
 using Application.Core;
 using AutoMapper;
 using MediatR;
 using Persistence;
 
-namespace Application.Activities.Commands;
+namespace Application.Announcements.Commands;
 
 public class EditAnnouncement
 {

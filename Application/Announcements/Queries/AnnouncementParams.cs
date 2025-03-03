@@ -1,9 +1,8 @@
-using System;
 using Application.Core;
 
-namespace Application.Activities.Queries;
+namespace Application.Announcements.Queries;
 
-public class ActivityParams : PaginationParams<DateTime?>
+public class AnnouncementParams : PaginationParams<DateTime?>
 {
     public string? Filter { get; set; }
     public DateTime StartDate { get; set; } = DateTime.UtcNow;

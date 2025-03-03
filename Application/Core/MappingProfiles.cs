@@ -1,4 +1,4 @@
-using Application.Activities.DTOs;
+using Application.Announcements.DTOs;
 using AutoMapper;
 using Domain;
 

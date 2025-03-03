@@ -1,7 +1,7 @@
-using Application.Activities.DTOs;
+using Application.Announcements.DTOs;
 using FluentValidation;
 
-namespace Application.Activities.Validators;
+namespace Application.Announcements.Validators;
 
 public class BaseAnnouncementValidator<T, TDto> : AbstractValidator<T> where TDto 
     : BaseAnnouncementDto
