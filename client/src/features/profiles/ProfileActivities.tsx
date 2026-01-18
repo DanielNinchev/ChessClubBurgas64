@@ -44,7 +44,7 @@ export default function ProfileActivities() {
                 </Typography>
             ) : null}
             <Grid2 container spacing={2} sx={{ marginTop: 2, height: 400, overflow: 'auto' }}>
-                {userActivities && userActivities.map((activity: Activity) => (
+                {userActivities && userActivities.map((activity: Announcement) => (
                     <Grid2 size={2} key={activity.id}>
                         <Link to={`/activities/${activity.id}`} style={{ textDecoration: 'none' }}>
                             <Card elevation={4}>

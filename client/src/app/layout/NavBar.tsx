@@ -23,7 +23,7 @@ export default function NavBar() {
                             <MenuItem component={NavLink} to='/' sx={{ display: 'flex', gap: 2 }}>
                                 <Group fontSize="large" />
                                 <Typography sx={{position: 'relative'}} variant="h4" fontWeight='bold'>
-                                    Reactivities
+                                    ШК Бургас-64
                                 </Typography>
                                 <Observer>
                                     {() => uiStore.isLoading ? (
@@ -42,11 +42,11 @@ export default function NavBar() {
                             </MenuItem>
                         </Box>
                         <Box sx={{ display: 'flex' }}>
-                            <MenuItemLink to='/activities'>
-                                Activities
+                            <MenuItemLink to='/announcements'>
+                                Новини
                             </MenuItemLink>
-                            <MenuItemLink to='/counter'>
-                                Counter
+                            <MenuItemLink to='/contacts'>
+                                Контакти
                             </MenuItemLink>
                             <MenuItemLink to='/errors'>
                                 Errors
@@ -57,8 +57,8 @@ export default function NavBar() {
                                 <UserMenu />
                             ) : (
                                 <>
-                                    <MenuItemLink to='/login'>Login</MenuItemLink>
-                                    <MenuItemLink to='/register'>Register</MenuItemLink>
+                                    <MenuItemLink to='/login'>Вход</MenuItemLink>
+                                    <MenuItemLink to='/register'>Регистрация</MenuItemLink>
                                 </>
                             )}
                         </Box>

@@ -48,7 +48,7 @@ agent.interceptors.response.use(
                 if (data.detail === 'NotAllowed') {
                     throw new Error(data.detail)
                 } else {
-                    toast.error('Unauthorised');
+                    toast.error('Не сте влезли в профила си!');
                 }
                 break;
             case 404:

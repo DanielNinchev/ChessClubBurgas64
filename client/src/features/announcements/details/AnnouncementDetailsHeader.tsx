@@ -1,15 +1,15 @@
 import { Card, CardMedia, Box, Typography, Chip } from "@mui/material";
 import { Link } from "react-router";
 import { formatDate } from "../../../lib/util/util";
-import { useActivities } from "../../../lib/hooks/useActivities";
+import { useAnnouncements } from "../../../lib/hooks/useAnnouncements";
 import StyledButton from "../../../app/shared/components/StyledButton";
 
 type Props = {
-    activity: Activity
+    activity: Announcement
 }
 
-export default function ActivityDetailsHeader({activity}: Props) {
-    const {updateAttendance} = useActivities(activity.id);
+export default function AnnouncementDetailsHeader({activity}: Props) {
+    const {updateAttendance} = useAnnouncements(activity.id);
 
     return (
         <Card sx={{ position: 'relative', mb: 2, backgroundColor: 'transparent', overflow: 'hidden' }}>

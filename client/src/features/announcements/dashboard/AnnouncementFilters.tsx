@@ -5,8 +5,8 @@ import Calendar from "react-calendar";
 import { useStore } from "../../../lib/hooks/useStore";
 import { observer } from "mobx-react-lite";
 
-const ActivityFilters = observer(function ActivityFilters() {
-    const { activityStore: {setFilter, setStartDate, filter, startDate}} = useStore();
+const ActivityFilters = observer(function AnnouncementFilters() {
+    const { announcementStore: {setFilter, setStartDate, filter, startDate}} = useStore();
     
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, borderRadius: 3 }}>
@@ -16,7 +16,7 @@ const ActivityFilters = observer(function ActivityFilters() {
                         sx={{ display: 'flex', alignItems: 'center', mb: 1, color: 'primary.main' }}
                     >
                         <FilterList sx={{ mr: 1 }} />
-                        Filters
+                        Филтри
                     </Typography>
                     <MenuList>
                         <MenuItem
@@ -44,7 +44,7 @@ const ActivityFilters = observer(function ActivityFilters() {
                 <Typography variant="h6"
                     sx={{ display: 'flex', alignItems: 'center', mb: 1, color: 'primary.main' }}>
                     <Event sx={{ mr: 1 }} />
-                    Select date
+                    Избери дата
                 </Typography>
                 <Calendar 
                     value={startDate}

@@ -38,7 +38,7 @@ export const useProfile = (id?: string, predicate?: string) => {
     const {data: userActivities, isLoading: loadingUserActivities} = useQuery({
         queryKey: ['user-activities', filter],
         queryFn: async () => {
-            const response = await agent.get<Activity[]>(`/profiles/${id}/activities`, {
+            const response = await agent.get<Announcement[]>(`/profiles/${id}/activities`, {
                 params: {
                     filter
                 }
@@ -65,7 +65,6 @@ export const useProfile = (id?: string, predicate?: string) => {
                 if (!data) return data;
                 return {
                     ...data,
-                    imageUrl: data.imageUrl ?? photo.url
                 }
             });
             queryClient.setQueryData(['profile', id], (data: Profile) => {

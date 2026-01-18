@@ -5,10 +5,10 @@ import { useState } from "react";
 import MapComponent from "../../../app/shared/components/MapComponent";
 
 type Props = {
-    activity: Activity
+    activity: Announcement
 }
 
-export default function ActivityDetailsInfo({activity}: Props) {
+export default function AnnouncementDetailsInfo({activity}: Props) {
     const [mapOpen, setMapOpen] = useState(false);
 
     return (
