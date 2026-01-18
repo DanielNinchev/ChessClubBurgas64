@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 
-export class ActivityStore {
+export class AnnouncementStore {
     filter = 'all';
     startDate = new Date().toISOString();
 

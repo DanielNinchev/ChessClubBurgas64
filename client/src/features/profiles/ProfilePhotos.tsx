@@ -21,12 +21,10 @@ export default function ProfilePhotos() {
     }
 
     if (loadingPhotos) return <Typography>Loading photos...</Typography>
-
     if (!photos) return <Typography>No photos found for this user</Typography>
 
     return (
         <Box>
-
             <Box display='flex' justifyContent='space-between'>
                 <Typography variant="h5">Photos</Typography>
                 {isCurrentUser && (
@@ -78,7 +76,6 @@ export default function ProfilePhotos() {
                                                 </Box>
                                             )}
                                         </div>
-
                                     )}
                                 </ImageListItem>
                             ))}

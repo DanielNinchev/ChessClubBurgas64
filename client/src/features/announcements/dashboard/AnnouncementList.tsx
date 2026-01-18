@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material";
-import ActivityCard from "./ActivityCard";
-import { useActivities } from "../../../lib/hooks/useActivities";
+import AnnouncementCard from "./AnnouncementCard";
+import { useAnnouncements } from "../../../lib/hooks/useAnnouncements";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
-const ActivityList = observer(function ActivityList() {
-  const { activitiesGroup, isLoading, hasNextPage, fetchNextPage } = useActivities();
+const ActivityList = observer(function AnnouncementList() {
+  const { activitiesGroup, isLoading, hasNextPage, fetchNextPage } = useAnnouncements();
   const {ref, inView} = useInView({
     threshold: 0.5
   });
@@ -17,9 +17,9 @@ const ActivityList = observer(function ActivityList() {
     }
   }, [inView, hasNextPage, fetchNextPage])
 
-  if (isLoading) return <Typography>Loading...</Typography>
+  if (isLoading) return <Typography>Зареждане...</Typography>
 
-  if (!activitiesGroup) return <Typography>No activities found</Typography>
+  if (!activitiesGroup) return <Typography>Няма открити новини</Typography>
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -32,7 +32,7 @@ const ActivityList = observer(function ActivityList() {
           gap={3}
         >
           {activities.items.map(activity => (
-            <ActivityCard
+            <AnnouncementCard
               key={activity.id}
               activity={activity}
             />

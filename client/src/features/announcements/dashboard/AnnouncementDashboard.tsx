@@ -1,8 +1,8 @@
 import { Grid2 } from "@mui/material";
-import ActivityList from "./ActivityList";
-import ActivityFilters from "./ActivityFilters";
+import ActivityList from "./AnnouncementList";
+import ActivityFilters from "./AnnouncementFilters";
 
-export default function ActivityDashboard() {
+export default function AnnouncementDashboard() {
     return (
         <Grid2 container spacing={3}>
             <Grid2 size={8}>

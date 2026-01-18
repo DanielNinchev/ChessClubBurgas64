@@ -2,10 +2,10 @@ import { Paper, Typography, List, ListItem, Chip, ListItemAvatar, Avatar, ListIt
 import { Link } from "react-router";
 
 type Props = {
-    activity: Activity
+    activity: Announcement
 }
 
-export default function ActivityDetailsSidebar({ activity }: Props) {
+export default function AnnouncementDetailsSidebar({ activity }: Props) {
     return (
         <>
             <Paper

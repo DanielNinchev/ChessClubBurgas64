@@ -1,9 +1,9 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import App from "../layout/App";
 import HomePage from "../../features/home/HomePage";
-import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
-import ActivityForm from "../../features/activities/form/ActivityForm";
-import ActivityDetailPage from "../../features/activities/details/ActivityDetailPage";
+import AnnouncementDashboard from "../../features/announcements/dashboard/AnnouncementDashboard";
+import AnnouncementForm from "../../features/announcements/form/AnnouncementForm";
+import AnnouncementDetailsPage from "../../features/announcements/details/AnnouncementDetailsPage";
 import Counter from "../../features/counter/Counter";
 import TestErrors from "../../features/errors/TestErrors";
 import NotFound from "../../features/errors/NotFound";
@@ -24,10 +24,10 @@ export const router = createBrowserRouter([
         element: <App />,
         children: [
             {element: <RequireAuth />, children: [
-                { path: 'activities', element: <ActivityDashboard /> },
-                { path: 'activities/:id', element: <ActivityDetailPage /> },
-                { path: 'createActivity', element: <ActivityForm key='create' /> },
-                { path: 'manage/:id', element: <ActivityForm /> },
+                { path: 'activities', element: <AnnouncementDashboard /> },
+                { path: 'activities/:id', element: <AnnouncementDetailsPage /> },
+                { path: 'createAnnouncement', element: <AnnouncementForm key='create' /> },
+                { path: 'manage/:id', element: <AnnouncementForm /> },
                 { path: 'profiles/:id', element: <ProfilePage /> },
                 { path: 'change-password', element: <ChangePasswordForm /> },
             ]},
@@ -43,6 +43,17 @@ export const router = createBrowserRouter([
             { path: 'reset-password', element: <ResetPasswordForm /> },
             { path: 'auth-callback', element: <AuthCallback /> },
             { path: '*', element: <Navigate replace to='/not-found' /> },
+
+            // {path: 'announcements', element: <AnnouncementDashboard />},
+            // {path: 'announcements/create', element: <AnnouncementForm key='create' />},
+            // {path: 'announcements/update/:id', element: <AnnouncementForm key='update' />},
+            // {path: 'announcements/:id', element: <AnnouncementDetails />},
+
+            // {path: 'contacts', element: <Contacts />},
+
+            // {path: 'puzzles', element: <PuzzleDashboard />},
+            // {path: 'puzzles/create', element: <PuzzleForm key='create' />},
+            // {path: 'puzzles/update/:id', element: <PuzzleForm key='update' />},
         ]
     }
 ])

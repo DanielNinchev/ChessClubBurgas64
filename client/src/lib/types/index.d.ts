@@ -9,23 +9,20 @@ type ResetPassword = {
   newPassword: string
 }
 
-type Activity = {
+type Announcement = {
+  id: string;
+  title: string;
+  date: Date;
+  description: string;
+  text: string;
+  mainPhotoUrl: string;
+  photos: Photo[]
+}
+
+type Photo = {
   id: string
-  title: string
-  date: Date
-  description: string
-  category: string
-  isCancelled: boolean
-  city: string
-  venue: string
-  latitude: number
-  longitude: number
-  attendees: Profile[]
-  isGoing: boolean
-  isHost: boolean
-  hostId: string
-  hostDisplayName: string
-  hostImageUrl?: string
+  url: string
+  isMain: boolean;
 }
 
 type Profile = {
@@ -38,16 +35,24 @@ type Profile = {
   following?: boolean
 }
 
-type Photo = {
-  id: string
-  url: string
+type Puzzle = {
+  id: number;
+  title: string;
+  description: string;
+  solution: string;
+  points: number;
+  difficulty: string;
+  photoUrl: string;
+  photo: Photo
 }
 
 type User = {
   id: string
-  email: string
-  displayName: string
-  imageUrl?: string
+  email: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  isAdmin: boolean;
 }
 
 type ChatComment = {

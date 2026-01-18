@@ -5,10 +5,10 @@ import { formatDate } from "../../../lib/util/util";
 import AvatarPopover from "../../../app/shared/components/AvatarPopover";
 
 type Props = {
-  activity: Activity
+  activity: Announcement
 }
 
-export default function ActivityCard({ activity }: Props) {
+export default function AnnouncementCard({ activity }: Props) {
   const label = activity.isHost ? 'You are hosting' : 'You are going';
   const color = activity.isHost ? 'secondary' : activity.isGoing ? 'warning' : 'default';
 
