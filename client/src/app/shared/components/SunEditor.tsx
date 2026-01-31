@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
 import { useField } from 'formik';
-import 'suneditor/dist/css/suneditor.min.css';
+import React, { useEffect, useRef } from 'react';
 import suneditor from 'suneditor';
+import 'suneditor/dist/css/suneditor.min.css';
 import { align, font, fontColor, fontSize, hiliteColor, image, link, list, video } from 'suneditor/src/plugins';
 
 interface Props {

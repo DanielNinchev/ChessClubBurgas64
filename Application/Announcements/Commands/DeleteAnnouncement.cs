@@ -15,12 +15,12 @@ public class DeleteAnnouncement
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var activity = await context.Announcements
+            var announcement = await context.Announcements
                 .FindAsync([request.Id], cancellationToken);
 
-            if (activity == null) return Result<Unit>.Failure("Announcement not found", 404);
+            if (announcement == null) return Result<Unit>.Failure("Announcement not found", 404);
 
-            context.Remove(activity);
+            context.Remove(announcement);
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 

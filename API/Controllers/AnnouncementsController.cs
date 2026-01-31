@@ -11,34 +11,34 @@ public class AnnouncementsController : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<PagedList<AnnouncementDto, DateTime?>>> GetAnnouncements(
-            [FromQuery]AnnouncementParams activityParams)
+            [FromQuery] AnnouncementParams AnnouncementParams)
     {
-        return HandleResult(await Mediator.Send(new GetAnnouncementList.Query{Params = activityParams}));
+        return HandleResult(await Mediator.Send(new GetAnnouncementList.Query { Params = AnnouncementParams }));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<AnnouncementDto>> GetActivityDetail(string id)
+    public async Task<ActionResult<AnnouncementDto>> GetAnnouncementDetail(string id)
     {
         return HandleResult(await Mediator.Send(new GetAnnouncementDetails.Query { Id = id }));
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> CreateActivity(CreateAnnouncementDto activityDto)
+    public async Task<ActionResult<string>> CreateAnnouncement(CreateAnnouncementDto AnnouncementDto)
     {
-        return HandleResult(await Mediator.Send(new CreateAnnouncement.Command { AnnouncementDto = activityDto }));
+        return HandleResult(await Mediator.Send(new CreateAnnouncement.Command { AnnouncementDto = AnnouncementDto }));
     }
 
     [HttpPut("{id}")]
     [Authorize(Policy = "IsChessClubAdmin")]
-    public async Task<ActionResult> EditActivity(string id, EditAnnouncementDto activity)
+    public async Task<ActionResult> EditAnnouncement(string id, EditAnnouncementDto Announcement)
     {
-        activity.Id = id;
-        return HandleResult(await Mediator.Send(new EditAnnouncement.Command { AnnouncementDto = activity }));
+        Announcement.Id = id;
+        return HandleResult(await Mediator.Send(new EditAnnouncement.Command { AnnouncementDto = Announcement }));
     }
 
     [HttpDelete("{id}")]
     [Authorize(Policy = "IsChessClubAdmin")]
-    public async Task<ActionResult> DeleteActivity(string id)
+    public async Task<ActionResult> DeleteAnnouncement(string id)
     {
         return HandleResult(await Mediator.Send(new DeleteAnnouncement.Command { Id = id }));
     }

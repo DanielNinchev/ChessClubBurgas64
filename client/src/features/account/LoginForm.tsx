@@ -1,13 +1,13 @@
-import { useForm } from "react-hook-form";
-import { useAccount } from "../../lib/hooks/useAccount"
-import { loginSchema, LoginSchema } from "../../lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LockOpen } from "@mui/icons-material";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { GitHub, LockOpen } from "@mui/icons-material";
-import TextInput from "../../app/shared/components/TextInput";
-import { Link, useLocation, useNavigate } from "react-router";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import TextInput from "../../app/shared/components/TextInput";
+import { useAccount } from "../../lib/hooks/useAccount";
+import { loginSchema, LoginSchema } from "../../lib/schemas/loginSchema";
 
 export default function LoginForm() {
     const [notVerified, setNotVerified] = useState(false);
@@ -22,19 +22,18 @@ export default function LoginForm() {
 
     const handleResendEmail = async () => {
         try {
-
-            await resendConfirmationEmail.mutateAsync({email});
+            await resendConfirmationEmail.mutateAsync({ email });
             setNotVerified(false);
         } catch (error) {
             console.log(error);
-            toast.error('Problem sending email - please check email address');
+            toast.error('Възникна грешка при изпращането на имейла - моля, проверете електронната си поща.');
         }
     }
 
     const onSubmit = async (data: LoginSchema) => {
         await loginUser.mutateAsync(data, {
             onSuccess: () => {
-                navigate(location.state?.from || '/activities');
+                navigate(location.state?.from || '/announcements');
             },
             onError: error => {
                 if (error.message === 'NotAllowed') {
@@ -42,13 +41,6 @@ export default function LoginForm() {
                 }
             }
         });
-    }
-
-    const loginWithGithub = () => {
-        const clientId = import.meta.env.VITE_GIHUB_CLIENT_ID;
-        const redirectUrl = import.meta.env.VITE_REDIRECT_URL;
-        window.location.href = 
-            `https://github.com/login/oauth/authorize?client_id=${clientId}&redirectUri=${redirectUrl}&scope=read:user user:email`
     }
 
     return (
@@ -78,40 +70,30 @@ export default function LoginForm() {
                 variant="contained"
                 size="large"
             >
-                Login
-            </Button>
-            <Button
-                onClick={loginWithGithub}
-                startIcon={<GitHub />}
-                sx={{backgroundColor: 'black'}}
-                type="button"
-                variant="contained"
-                size="large"
-            >
-                Login with Github
+                Вход
             </Button>
             {notVerified ? (
                 <Box display='flex' flexDirection='column' justifyContent='center'>
                     <Typography textAlign='center' color='error'>
-                        Your email has not been verified.  You can click the button to re-send the verification email
+                        Електронната Ви поща все още не е потвърдена. Можете да натиснете бутона за препращане на имейла за потвърждение.
                     </Typography>
                     <Button
                         disabled={resendConfirmationEmail.isPending}
                         onClick={handleResendEmail}
                     >
-                        Re-send email link
+                        Препращане на имейла за потвърждение
                     </Button>
                 </Box>
             ) : (
                 <Box display='flex' alignItems='center' justifyContent='center' gap={3}>
                     <Typography>
-                        Forgot password? Click <Link to='/forgot-password'>here</Link>
+                        Забравена парола? Натиснете <Link to='/forgot-password'>тук</Link>
                     </Typography>
 
                     <Typography sx={{ textAlign: 'center' }}>
-                        Don't have an account?
+                        Нямате профил?
                         <Typography sx={{ ml: 2 }} component={Link} to='/register' color="primary">
-                            Sign up
+                            Регистрация
                         </Typography>
                     </Typography>
                 </Box>

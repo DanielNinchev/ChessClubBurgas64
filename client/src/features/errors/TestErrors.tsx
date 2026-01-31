@@ -1,11 +1,11 @@
 import { Alert, Button, ButtonGroup, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
+import { useState } from "react";
 import agent from "../../lib/api/agent.ts";
-import {useState} from "react";
 
 export default function TestErrors() {
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
-    
+
     const { mutate } = useMutation({
         mutationFn: async ({ path, method = 'get' }: { path: string; method: string }) => {
             if (method === 'post') await agent.post(path, {});
@@ -21,7 +21,7 @@ export default function TestErrors() {
     });
 
     const handleError = (path: string, method = 'get') => {
-        mutate({path, method});
+        mutate({ path, method });
     };
 
     return (
@@ -35,7 +35,7 @@ export default function TestErrors() {
                 <Button onClick={() => handleError('buggy/bad-request')}>
                     Bad request
                 </Button>
-                <Button onClick={() => handleError('activities', 'post')}>
+                <Button onClick={() => handleError('announcements', 'post')}>
                     Validation error
                 </Button>
                 <Button onClick={() => handleError('buggy/server-error')}>

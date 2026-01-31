@@ -1,11 +1,11 @@
-import { useForm } from "react-hook-form";
-import { editProfileSchema, EditProfileSchema } from "../../lib/schemas/editProfileSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useProfile } from "../../lib/hooks/useProfile.ts";
-import { useEffect } from "react";
 import { Box, Button } from "@mui/material";
-import TextInput from "../../app/shared/components/TextInput.tsx";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useParams } from "react-router";
+import TextInput from "../../app/shared/components/TextInput.tsx";
+import { useProfile } from "../../lib/hooks/useProfile.ts";
+import { editProfileSchema, EditProfileSchema } from "../../lib/schemas/editProfileSchema.ts";
 
 type Props = {
     setEditMode: (editMode: boolean) => void;
@@ -54,7 +54,7 @@ export default function ProfileEdit({ setEditMode }: Props) {
                 variant='contained'
                 disabled={!isValid || !isDirty || updateProfile.isPending}
             >
-                Update profile
+                Редактирайте профила си
             </Button>
         </Box>
     );
