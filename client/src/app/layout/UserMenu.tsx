@@ -1,12 +1,12 @@
-import * as React from 'react';
+import { Add, Logout, Password, Person } from '@mui/icons-material';
+import { Divider, ListItemIcon, ListItemText } from '@mui/material';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import * as React from 'react';
 import { useState } from 'react';
-import { Avatar, Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
-import { useAccount } from '../../lib/hooks/useAccount';
 import { Link } from 'react-router';
-import { Add, Logout, Password, Person } from '@mui/icons-material';
+import { useAccount } from '../../lib/hooks/useAccount';
 
 export default function UserMenu() {
     const { currentUser, logoutUser } = useAccount();
@@ -29,13 +29,6 @@ export default function UserMenu() {
                 size='large'
                 sx={{ fontSize: '1.1rem' }}
             >
-                <Box display='flex' alignItems='center' gap={2}>
-                    <Avatar 
-                        src={currentUser?.imageUrl}
-                        alt='current user image'
-                    />
-                    {currentUser?.displayName}
-                </Box>
             </Button>
             <Menu
                 id="basic-menu"
@@ -46,11 +39,11 @@ export default function UserMenu() {
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                <MenuItem component={Link} to='/createActivity' onClick={handleClose}>
+                <MenuItem component={Link} to='/createAnnouncement' onClick={handleClose}>
                     <ListItemIcon>
                         <Add />
                     </ListItemIcon>
-                    <ListItemText>Create Activity</ListItemText>
+                    <ListItemText>Напиши новина</ListItemText>
                 </MenuItem>
                 <MenuItem component={Link} to={`/profiles/${currentUser?.id}`} onClick={handleClose}>
                     <ListItemIcon>

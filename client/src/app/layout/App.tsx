@@ -1,7 +1,7 @@
 import { Box, Container, CssBaseline } from "@mui/material";
-import NavBar from "./NavBar";
 import { Outlet, ScrollRestoration, useLocation } from "react-router";
 import HomePage from "../../features/home/HomePage";
+import NavBar from "./NavBar";
 
 function App() {
   const location = useLocation();

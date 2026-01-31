@@ -1,16 +1,16 @@
-import { Box, Button, Paper, Typography } from "@mui/material";
-import { useAnnouncements } from "../../../lib/hooks/useAnnouncements";
-import { useNavigate, useParams } from "react-router";
-import { useForm } from 'react-hook-form';
-import { useEffect } from "react";
-import { announcementSchema, ActivitySchema } from "../../../lib/schemas/announcementSchema";
 import { zodResolver } from '@hookform/resolvers/zod';
-import TextInput from "../../../app/shared/components/TextInput";
+import { Box, Button, Paper, Typography } from "@mui/material";
+import { useEffect } from "react";
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from "react-router";
 import DateTimeInput from "../../../app/shared/components/DateTimeInput";
 import SunEditor from "../../../app/shared/components/SunEditor";
+import TextInput from "../../../app/shared/components/TextInput";
+import { useAnnouncements } from "../../../lib/hooks/useAnnouncements";
+import { AnnouncementSchema, announcementSchema } from "../../../lib/schemas/announcementSchema";
 
 export default function AnnouncementForm() {
-    const { control, reset, handleSubmit } = useForm<ActivitySchema>({
+    const { control, reset, handleSubmit } = useForm<AnnouncementSchema>({
         mode: 'onTouched',
         resolver: zodResolver(announcementSchema)
     });
@@ -24,15 +24,15 @@ export default function AnnouncementForm() {
         });
     }, [announcement, reset]);
 
-    const onSubmit = async (data: Announcement) => {
+    const onSubmit = async (data: AnnouncementSchema) => {
         try {
             if (announcement) {
-                updateAnnouncement.mutate({...announcement, ...data}, {
-                    onSuccess: () => navigate(`/activities/${announcement.id}`)
+                updateAnnouncement.mutate({ ...announcement, ...data }, {
+                    onSuccess: () => navigate(`/announcements/${announcement.id}`)
                 })
             } else {
                 createAnnouncement.mutate(data, {
-                    onSuccess: (id) => navigate(`/activities/${id}`)
+                    onSuccess: (id) => navigate(`/announcements/${id}`)
                 })
             }
         } catch (error) {
@@ -40,7 +40,7 @@ export default function AnnouncementForm() {
         }
     }
 
-    //if (isLoadingActivity) return <Typography>Loading announcement...</Typography>
+    //if (isLoadingAnnouncement) return <Typography>Loading announcement...</Typography>
 
     return (
         <Paper sx={{ borderRadius: 3, padding: 3 }}>
@@ -52,7 +52,7 @@ export default function AnnouncementForm() {
                 <TextInput label='Description' control={control} name='description'
                     multiline rows={3} />
                 <DateTimeInput label='Date' control={control} name='date' />
-                <SunEditor label='Текстово съдържание:' name='text' initialValue={announcement?.text}/>
+                <SunEditor label='Текстово съдържание:' name='text' initialValue={announcement?.text} />
                 <Box display='flex' justifyContent='end' gap={3}>
                     <Button onClick={() => navigate(-1)} color='inherit'>Отказ</Button>
                     <Button

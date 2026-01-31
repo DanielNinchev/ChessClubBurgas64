@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { useAccount } from "../../lib/hooks/useAccount"
-import { Link, useSearchParams } from "react-router";
-import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import { EmailRounded } from "@mui/icons-material";
+import { Box, Button, Divider, Paper, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router";
+import { useAccount } from "../../lib/hooks/useAccount";
 
 export default function VerifyEmail() {
     const { verifyEmail, resendConfirmationEmail } = useAccount();
@@ -29,13 +29,13 @@ export default function VerifyEmail() {
                 return (
                     <Box display='flex' flexDirection='column' gap={2} justifyContent='center'>
                         <Typography>
-                            Verification failed.  You can try resending the verify link to your email
+                            Неуспешно потвърждение. Можете да опитате да изпратите отново линка за потвърждение на електронната си поща.
                         </Typography>
-                        <Button 
-                            onClick={() => resendConfirmationEmail.mutate({userId})}
+                        <Button
+                            onClick={() => resendConfirmationEmail.mutate({ userId })}
                             disabled={resendConfirmationEmail.isPending}
                         >
-                            Resend verification email
+                            Препращане на имейла за потвърждение
                         </Button>
                     </Box>
                 );
@@ -43,10 +43,10 @@ export default function VerifyEmail() {
                 return (
                     <Box display='flex' flexDirection='column' gap={2} justifyContent='center'>
                         <Typography>
-                            Email has been verified - you can now login
+                            Електронната Ви поща е потвърдена! Можете да се впишете сега.
                         </Typography>
                         <Button component={Link} to='/login'>
-                            Go to login
+                            Вход
                         </Button>
                     </Box>
                 );
@@ -64,9 +64,9 @@ export default function VerifyEmail() {
                 p: 6
             }}
         >
-            <EmailRounded sx={{fontSize: 100}} color='primary' />
+            <EmailRounded sx={{ fontSize: 100 }} color='primary' />
             <Typography gutterBottom variant="h3">
-                Email verification
+                Потвърждение на електронната поща
             </Typography>
             <Divider />
             {getBody()}

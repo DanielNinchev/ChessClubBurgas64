@@ -1,7 +1,7 @@
 import axios from "axios";
-import { store } from "../stores/store";
 import { toast } from "react-toastify";
 import { router } from "../../app/router/Routes";
+import { store } from "../stores/store";
 
 const sleep = (delay: number) => {
     return new Promise(resolve => {
@@ -55,7 +55,7 @@ agent.interceptors.response.use(
                 router.navigate('/not-found');
                 break;
             case 500:
-                router.navigate('/server-error', {state: {error: data}})
+                router.navigate('/server-error', { state: { error: data } })
                 break;
             default:
                 break;

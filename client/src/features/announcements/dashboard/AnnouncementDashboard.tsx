@@ -1,14 +1,14 @@
 import { Grid2 } from "@mui/material";
-import ActivityList from "./AnnouncementList";
-import ActivityFilters from "./AnnouncementFilters";
+import AnnouncementFilters from "./AnnouncementFilters";
+import AnnouncementList from "./AnnouncementList";
 
 export default function AnnouncementDashboard() {
     return (
         <Grid2 container spacing={3}>
             <Grid2 size={8}>
-                <ActivityList />
+                <AnnouncementList />
             </Grid2>
-            <Grid2 
+            <Grid2
                 size={4}
                 sx={{
                     position: 'sticky',
@@ -16,7 +16,7 @@ export default function AnnouncementDashboard() {
                     alignSelf: 'flex-start'
                 }}
             >
-                <ActivityFilters />
+                <AnnouncementFilters />
             </Grid2>
         </Grid2>
     )

@@ -18,7 +18,7 @@ using Resend;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers(opt => 
+builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
@@ -60,12 +60,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connStr);
 });
 builder.Services.AddCors();
-builder.Services.AddMediatR(x => {
+builder.Services.AddMediatR(x =>
+{
     x.RegisterServicesFromAssemblyContaining<GetAnnouncementList.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 builder.Services.AddHttpClient<ResendClient>();
-builder.Services.Configure<ResendClientOptions>(opt => 
+builder.Services.Configure<ResendClientOptions>(opt =>
 {
     opt.ApiToken = builder.Configuration["Resend:ApiToken"]!;
 });
@@ -74,10 +75,13 @@ builder.Services.AddTransient<IEmailSender<Account>, EmailSender>();
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
-builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(MappingProfiles).Assembly);
+});
 builder.Services.AddValidatorsFromAssemblyContaining<CreateAnnouncementValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
-builder.Services.AddIdentityApiEndpoints<Account>(opt => 
+builder.Services.AddIdentityApiEndpoints<Account>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
     opt.SignIn.RequireConfirmedEmail = true;
@@ -85,7 +89,7 @@ builder.Services.AddIdentityApiEndpoints<Account>(opt =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("IsChessClubAdmin", policy => 
+    .AddPolicy("IsChessClubAdmin", policy =>
     {
         policy.Requirements.Add(new IsChessClubAdminRequirement());
     });
