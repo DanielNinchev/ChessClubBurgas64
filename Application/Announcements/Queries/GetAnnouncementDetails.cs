@@ -16,19 +16,19 @@ public class GetAnnouncementDetails
         public required string Id { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) 
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor)
         : IRequestHandler<Query, Result<AnnouncementDto>>
     {
         public async Task<Result<AnnouncementDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var activity = await context.Announcements
-                .ProjectTo<AnnouncementDto>(mapper.ConfigurationProvider, 
-                    new {currentUserId = userAccessor.GetUserId()})
+            var announcement = await context.Announcements
+                .ProjectTo<AnnouncementDto>(mapper.ConfigurationProvider,
+                    new { currentUserId = userAccessor.GetUserId() })
                 .FirstOrDefaultAsync(x => request.Id == x.Id, cancellationToken);
 
-            if (activity == null) return Result<AnnouncementDto>.Failure("Activity not found", 404);
+            if (announcement == null) return Result<AnnouncementDto>.Failure("announcement not found", 404);
 
-            return Result<AnnouncementDto>.Success(activity);
+            return Result<AnnouncementDto>.Success(announcement);
         }
     }
 }

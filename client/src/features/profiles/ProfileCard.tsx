@@ -1,5 +1,5 @@
 import { Person } from "@mui/icons-material";
-import { Box, Card, CardContent, CardMedia, Chip, Divider, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardMedia, Divider, Typography } from "@mui/material";
 import { Link } from "react-router";
 
 type Props = {
@@ -17,10 +17,10 @@ export default function ProfileCard({ profile }: Props) {
                 }}
                 elevation={4}
             >
-                <CardMedia 
-                    component='img' 
-                    src={profile?.imageUrl || '/images/user.png'} 
-                    sx={{width: '100%', zIndex: 50}}
+                <CardMedia
+                    component='img'
+                    src={profile?.imageUrl || '/images/user.png'}
+                    sx={{ width: '100%', zIndex: 50 }}
                     alt={profile.displayName + ' image'}
                 />
                 <CardContent>
@@ -38,16 +38,11 @@ export default function ProfileCard({ profile }: Props) {
                                 {profile.bio}
                             </Typography>
                         )}
-
-
-                        {profile.following && <Chip size="small" label='Following' 
-                            color="secondary" variant="outlined" />}
                     </Box>
                 </CardContent>
-                <Divider sx={{mb: 2}} />
-                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'start'}}>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}>
                     <Person />
-                    <Typography sx={{ml: 1}}>{profile.followersCount} Followers</Typography>
                 </Box>
             </Card>
         </Link>

@@ -1,13 +1,13 @@
-import { FieldValues } from "react-hook-form";
-import { useAccount } from "../../lib/hooks/useAccount"
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
-import AccountFormWrapper from "./AccountFormWrapper";
 import { LockOpen } from "@mui/icons-material";
+import { FieldValues } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import TextInput from "../../app/shared/components/TextInput";
+import { useAccount } from "../../lib/hooks/useAccount";
+import AccountFormWrapper from "./AccountFormWrapper";
 
 export default function ForgotPasswordForm() {
-    const {forgotPassword} = useAccount();
+    const { forgotPassword } = useAccount();
     const navigate = useNavigate();
 
     const onSubmit = async (data: FieldValues) => {
@@ -25,13 +25,13 @@ export default function ForgotPasswordForm() {
 
     return (
         <AccountFormWrapper
-            title='Please enter your email address'
+            title='Моля, въведете електронната си поща'
             icon={<LockOpen fontSize="large" />}
-            submitButtonText="Request password reset link"
+            submitButtonText="Изискайте линк за смяна на паролата"
             onSubmit={onSubmit}
         >
-            <TextInput rules={{required: true}} label='Email address' name='email' />
+            <TextInput rules={{ required: true }} label='Електронна поща' name='email' />
         </AccountFormWrapper>
-        
+
     )
 }

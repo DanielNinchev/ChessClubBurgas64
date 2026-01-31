@@ -1,11 +1,10 @@
-import {z} from 'zod';
+import { z } from 'zod';
 import { requiredString } from '../util/util';
 
 export const announcementSchema = z.object({
     title: requiredString('Title'),
     description: requiredString('Description'),
     text: requiredString('Text'),
-    //category: requiredString('Category'),
     date: z.coerce.date({
         message: 'Датата е задължителна'
     }),
@@ -16,4 +15,4 @@ export const announcementSchema = z.object({
     })
 })
 
-export type ActivitySchema = z.infer<typeof announcementSchema>;
+export type AnnouncementSchema = z.infer<typeof announcementSchema>;

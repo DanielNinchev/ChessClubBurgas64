@@ -17,11 +17,11 @@ public class EditAnnouncement
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var activity = await context.Announcements.FindAsync([request.AnnouncementDto.Id], cancellationToken);
+            var announcement = await context.Announcements.FindAsync([request.AnnouncementDto.Id], cancellationToken);
 
-            if (activity == null) return Result<Unit>.Failure("Announcement not found", 404);
+            if (announcement == null) return Result<Unit>.Failure("Announcement not found", 404);
 
-            mapper.Map(request.AnnouncementDto, activity);
+            mapper.Map(request.AnnouncementDto, announcement);
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 

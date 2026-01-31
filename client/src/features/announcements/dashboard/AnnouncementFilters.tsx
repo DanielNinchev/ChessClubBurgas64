@@ -1,13 +1,13 @@
-import { FilterList, Event } from "@mui/icons-material";
+import { Event, FilterList } from "@mui/icons-material";
 import { Box, ListItemText, MenuItem, MenuList, Paper, Typography } from "@mui/material";
-import 'react-calendar/dist/Calendar.css';
-import Calendar from "react-calendar";
-import { useStore } from "../../../lib/hooks/useStore";
 import { observer } from "mobx-react-lite";
+import Calendar from "react-calendar";
+import 'react-calendar/dist/Calendar.css';
+import { useStore } from "../../../lib/hooks/useStore";
 
-const ActivityFilters = observer(function AnnouncementFilters() {
-    const { announcementStore: {setFilter, setStartDate, filter, startDate}} = useStore();
-    
+const AnnouncementFilters = observer(function AnnouncementFilters() {
+    const { announcementStore: { setFilter, setStartDate, filter, startDate } } = useStore();
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, borderRadius: 3 }}>
             <Paper sx={{ p: 3, borderRadius: 3 }}>
@@ -23,19 +23,7 @@ const ActivityFilters = observer(function AnnouncementFilters() {
                             selected={filter === 'all'}
                             onClick={() => setFilter('all')}
                         >
-                            <ListItemText primary='All events' />
-                        </MenuItem>
-                        <MenuItem
-                            selected={filter === 'isGoing'}
-                            onClick={() => setFilter('isGoing')}
-                        >
-                            <ListItemText primary="I'm going" />
-                        </MenuItem>
-                        <MenuItem
-                            selected={filter === 'isHost'}
-                            onClick={() => setFilter('isHost')}
-                        >
-                            <ListItemText primary="I'm hosting" />
+                            <ListItemText primary='Всички новини' />
                         </MenuItem>
                     </MenuList>
                 </Box>
@@ -46,7 +34,7 @@ const ActivityFilters = observer(function AnnouncementFilters() {
                     <Event sx={{ mr: 1 }} />
                     Избери дата
                 </Typography>
-                <Calendar 
+                <Calendar
                     value={startDate}
                     onChange={date => setStartDate(date as Date)}
                 />
@@ -55,4 +43,4 @@ const ActivityFilters = observer(function AnnouncementFilters() {
     )
 })
 
-export default ActivityFilters;
+export default AnnouncementFilters;
