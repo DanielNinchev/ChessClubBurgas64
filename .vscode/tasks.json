@@ -2,40 +2,93 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build-api",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/ChessClubBurgas64.sln",
+                "${workspaceFolder}/API/API.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "publish-api",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/ChessClubBurgas64.sln",
+                "${workspaceFolder}/API/API.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "watch",
+            "label": "watch-api",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/ChessClubBurgas64.sln"
+                "${workspaceFolder}/API/API.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "run-client",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/client"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "vite",
+                "pattern": {
+                    "regexp": "^$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "VITE.*ready in",
+                    "endsPattern": "(Local|Network):.*http://localhost:5174"
+                }
+            }
+        },
+        {
+            "label": "run-client-background",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/client"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "VITE.*ready in",
+                    "endsPattern": "(Local|Network):.*http://localhost:5174"
+                }
+            }
+        },
+        {
+            "label": "install-client-deps",
+            "type": "npm",
+            "script": "install",
+            "path": "client/",
+            "problemMatcher": []
+        },
+        {
+            "label": "build-client",
+            "type": "npm",
+            "script": "build",
+            "path": "client/",
+            "problemMatcher": []
         }
     ]
 }

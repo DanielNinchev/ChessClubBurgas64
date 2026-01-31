@@ -1,10 +1,10 @@
 import { Group } from "@mui/icons-material";
-import { Box, AppBar, Toolbar, Typography, Container, MenuItem, CircularProgress } from "@mui/material";
-import { NavLink } from "react-router";
-import MenuItemLink from "../shared/components/MenuItemLink";
-import { useStore } from "../../lib/hooks/useStore";
+import { AppBar, Box, CircularProgress, Container, MenuItem, Toolbar, Typography } from "@mui/material";
 import { Observer } from "mobx-react-lite";
+import { NavLink } from "react-router";
 import { useAccount } from "../../lib/hooks/useAccount";
+import { useStore } from "../../lib/hooks/useStore";
+import MenuItemLink from "../shared/components/MenuItemLink";
 import UserMenu from "./UserMenu";
 
 export default function NavBar() {
@@ -22,7 +22,7 @@ export default function NavBar() {
                         <Box>
                             <MenuItem component={NavLink} to='/' sx={{ display: 'flex', gap: 2 }}>
                                 <Group fontSize="large" />
-                                <Typography sx={{position: 'relative'}} variant="h4" fontWeight='bold'>
+                                <Typography sx={{ position: 'relative' }} variant="h4" fontWeight='bold'>
                                     ШК Бургас-64
                                 </Typography>
                                 <Observer>

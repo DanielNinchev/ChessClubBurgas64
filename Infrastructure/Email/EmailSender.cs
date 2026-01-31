@@ -9,12 +9,12 @@ public class EmailSender(IResend resend, IConfiguration config) : IEmailSender<A
 {
     public async Task SendConfirmationLinkAsync(Account user, string email, string confirmationLink)
     {
-        var subject = "Потвърдете електронната си поща";
+        var subject = "РџРѕС‚РІСЉСЂРґРµС‚Рµ РёРјРµР№Р» Р°РґСЂРµСЃР° СЃРё";
         var body = $@"
-            <p>Здравейте, {user.FirstName},</p>
-            <p>Молим да потвърдите своята електронна поща, натискайки на връзката по-долу:</p>
-            <p><a href='{confirmationLink}'>Натиснете тук за потвърждение</a></p>
-            <p>Благодарим!</p>
+            <p>Р—РґСЂР°РІРµР№С‚Рµ, {user.FirstName},</p>
+            <p>РњРѕР»СЏ, РїРѕС‚РІСЉСЂРґРµС‚Рµ РёРјРµР№Р» Р°РґСЂРµСЃР° СЃРё, РєР°С‚Рѕ РєР»РёРєРЅРµС‚Рµ РЅР° СЃР»РµРґРЅРёСЏ Р»РёРЅРє:</p>
+            <p><a href='{confirmationLink}'>РџРѕС‚РІСЉСЂРґРµС‚Рµ РёРјРµР№Р» Р°РґСЂРµСЃР° СЃРё</a></p>
+            <p>Р‘Р»Р°РіРѕРґР°СЂРёРј РІРё!</p>
         ";
 
         await SendMailAsync(email, subject, body);
@@ -22,15 +22,14 @@ public class EmailSender(IResend resend, IConfiguration config) : IEmailSender<A
 
     public async Task SendPasswordResetCodeAsync(Account user, string email, string resetCode)
     {
-        var subject = "Променете паролата си";
+        var subject = "Р’СЉР·СЃС‚Р°РЅРѕРІСЏРІР°РЅРµ РЅР° РїР°СЂРѕР»Р°";
         var body = $@"
-            <p>Здравейте, {user.FirstName},</p>
-            <p>Натиснете тук, за да промените паролата си:</p>
+            <p>Р—РґСЂР°РІРµР№С‚Рµ, {user.FirstName},</p>
+            <p>РњРѕР»СЏ, РёР·РїРѕР»Р·РІР°Р№С‚Рµ СЃР»РµРґРЅРёСЏ РєРѕРґ Р·Р° РІСЉР·СЃС‚Р°РЅРѕРІСЏРІР°РЅРµ РЅР° РїР°СЂРѕР»Р°С‚Р° СЃРё:</p>
             <p><a href='{config["ClientAppUrl"]}/reset-password?email={email}&code={resetCode}'>
-                Промяна на парола</a>
+                Р’СЉР·СЃС‚Р°РЅРѕРІСЏРІР°РЅРµ РЅР° РїР°СЂРѕР»Р°</a>
             </p>
-            <p>Ако не сте поискали промяна на паролата си, не обръщайте внимание на това съобщение.</p>
-            </p>
+            <p>РђРєРѕ РЅРµ СЃС‚Рµ РїРѕРёСЃРєР°Р»Рё РІСЉР·СЃС‚Р°РЅРѕРІСЏРІР°РЅРµ РЅР° РїР°СЂРѕР»Р°С‚Р° СЃРё, РјРѕР»СЏ, РёРіРЅРѕСЂРёСЂР°Р№С‚Рµ С‚РѕР·Рё РёРјРµР№Р».</p>
         ";
 
         await SendMailAsync(email, subject, body);
