@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LockOpen } from "@mui/icons-material";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, Container, Paper, Typography } from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -44,60 +44,75 @@ export default function LoginForm() {
     }
 
     return (
-        <Paper
-            component='form'
-            onSubmit={handleSubmit(onSubmit)}
+        <Container
+            maxWidth="sm"
             sx={{
                 display: 'flex',
-                flexDirection: 'column',
-                p: 3,
-                gap: 3,
-                maxWidth: 'md',
-                mx: 'auto',
-                borderRadius: 3
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                pt: 10,
+                pb: 4,
             }}
         >
-            <Box display='flex' alignItems='center' justifyContent='center'
-                gap={3} color='secondary.main'>
-                <LockOpen fontSize="large" />
-                <Typography variant="h4">Sign in</Typography>
-            </Box>
-            <TextInput label='Email' control={control} name='email' />
-            <TextInput label='Password' type='password' control={control} name='password' />
-            <Button
-                type='submit'
-                disabled={!isValid || isSubmitting}
-                variant="contained"
-                size="large"
+            <Paper
+                component='form'
+                onSubmit={handleSubmit(onSubmit)}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    p: 4,
+                    gap: 2.5,
+                    width: '100%',
+                    borderRadius: 3,
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                }}
             >
-                Вход
-            </Button>
-            {notVerified ? (
-                <Box display='flex' flexDirection='column' justifyContent='center'>
-                    <Typography textAlign='center' color='error'>
-                        Електронната Ви поща все още не е потвърдена. Можете да натиснете бутона за препращане на имейла за потвърждение.
-                    </Typography>
-                    <Button
-                        disabled={resendConfirmationEmail.isPending}
-                        onClick={handleResendEmail}
-                    >
-                        Препращане на имейла за потвърждение
-                    </Button>
+                <Box display='flex' alignItems='center' justifyContent='center'
+                    gap={2} color='primary.main'>
+                    <LockOpen fontSize="large" />
+                    <Typography variant="h4" fontWeight={700}>Вход</Typography>
                 </Box>
-            ) : (
-                <Box display='flex' alignItems='center' justifyContent='center' gap={3}>
-                    <Typography>
-                        Забравена парола? Натиснете <Link to='/forgot-password'>тук</Link>
-                    </Typography>
-
-                    <Typography sx={{ textAlign: 'center' }}>
-                        Нямате профил?
-                        <Typography sx={{ ml: 2 }} component={Link} to='/register' color="primary">
-                            Регистрация
+                <TextInput label='Имейл' control={control} name='email' />
+                <TextInput label='Парола' type='password' control={control} name='password' />
+                <Button
+                    type='submit'
+                    disabled={!isValid || isSubmitting}
+                    variant="contained"
+                    size="large"
+                    sx={{ py: 1.5, fontWeight: 600, fontSize: '1rem', mt: 1 }}
+                >
+                    {isSubmitting ? 'Влизане...' : 'Вход'}
+                </Button>
+                {notVerified ? (
+                    <Box display='flex' flexDirection='column' justifyContent='center'>
+                        <Typography textAlign='center' color='error'>
+                            Електронната Ви поща все още не е потвърдена. Можете да натиснете бутона за препращане на имейла за потвърждение.
                         </Typography>
-                    </Typography>
-                </Box>
-            )}
-        </Paper>
+                        <Button
+                            disabled={resendConfirmationEmail.isPending}
+                            onClick={handleResendEmail}
+                        >
+                            Препращане на имейла за потвърждение
+                        </Button>
+                    </Box>
+                ) : (
+                    <Box display='flex' flexDirection='column' alignItems='center' gap={1}>
+                        <Typography>
+                            Забравена парола? Натиснете{' '}
+                            <Typography component={Link} to='/forgot-password' color="primary" fontWeight={600}>
+                                тук
+                            </Typography>
+                        </Typography>
+                        <Typography>
+                            Нямате акаунт?{' '}
+                            <Typography component={Link} to='/register' color="primary" fontWeight={600}>
+                                Регистрация
+                            </Typography>
+                        </Typography>
+                    </Box>
+                )}
+            </Paper>
+        </Container>
     )
 }

@@ -8,10 +8,10 @@ import { formatDate } from "../../../lib/util/util";
 
 export default function AnnouncementDetails() {
     const { id } = useParams();
-    const { isLoading, announcement } = useAnnouncements(id);
+    const { loadingAnnouncement, announcement } = useAnnouncements(id);
     const navigate = useNavigate();
 
-    if (isLoading) return <LoadingComponent />
+    if (loadingAnnouncement) return <LoadingComponent />
     if (!announcement) return <div>Новината не беше намерена.</div>;
 
     return (

@@ -1,9 +1,8 @@
 using Application.Core;
-using Application.Interfaces;
 using Application.Profiles.DTOs;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Domain;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -16,19 +15,32 @@ public class GetProfile
         public required string UserId { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) 
+    public class Handler(AppDbContext context, UserManager<Account> userManager)
         : IRequestHandler<Query, Result<ProfileDto>>
     {
         public async Task<Result<ProfileDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var profile = await context.Users
-                .ProjectTo<ProfileDto>(mapper.ConfigurationProvider, 
-                    new {currentUserId = userAccessor.GetUserId()})
-                .SingleOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+            var user = await context.Users
+                .Include(u => u.StudentProfile)
+                    .ThenInclude(s => s!.Teacher)
+                        .ThenInclude(t => t!.Account)
+                .Include(u => u.TeacherProfile)
+                    .ThenInclude(t => t!.Students)
+                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
-            return profile == null
-                ? Result<ProfileDto>.Failure("Profile not found", 404)
-                : Result<ProfileDto>.Success(profile);
+            if (user == null)
+                return Result<ProfileDto>.Failure("Профилът не е намерен", 404);
+
+            var roles = await userManager.GetRolesAsync(user);
+
+            ProfileDto profile = user switch
+            {
+                _ when user.StudentProfile != null => user.ToStudentProfileDto(roles),
+                _ when user.TeacherProfile != null => user.ToTeacherProfileDto(roles),
+                _ => user.ToBaseProfileDto(roles),
+            };
+
+            return Result<ProfileDto>.Success(profile);
         }
     }
 }

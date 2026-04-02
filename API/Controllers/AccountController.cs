@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using API.DTOs;
 using Domain;
@@ -9,13 +10,90 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AccountController(SignInManager<Account> signInManager,
-    IEmailSender<Account> emailSender, IConfiguration config) : BaseApiController
+[ApiController]
+[Route("api/account")]
+public class AccountController(
+    UserManager<Account> userManager,
+    SignInManager<Account> signInManager,
+    IEmailSender<Account> emailSender,
+    IConfiguration config) : ControllerBase
 {
-    [AllowAnonymous]
-    [HttpPost("register")]
-    public async Task<ActionResult> RegisterUser(RegisterDto registerDto)
+    [HttpGet("user-info")]
+    [Authorize]
+    public async Task<ActionResult> GetUserInfo()
     {
+        var user = await userManager.Users
+            .FirstOrDefaultAsync(u => u.Email == User.FindFirstValue(ClaimTypes.Email));
+
+        if (user == null) return Unauthorized();
+
+        var roles = await userManager.GetRolesAsync(user);
+
+        return Ok(new
+        {
+            user.Id,
+            user.Email,
+            user.FirstName,
+            user.MiddleName,
+            user.LastName,
+            Roles = roles,
+        });
+    }
+
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        await signInManager.SignOutAsync();
+        return Ok();
+    }
+
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+
+        // Always return OK to avoid leaking user existence
+        if (user == null) return Ok();
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        var clientUrl = config["ClientUrl"] ?? "http://localhost:3000";
+        var resetLink = $"{clientUrl}/reset-password?email={Uri.EscapeDataString(dto.Email)}&code={encodedToken}";
+
+        await emailSender.SendPasswordResetCodeAsync(user, dto.Email, encodedToken);
+
+        return Ok();
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user == null) return BadRequest("Невалидна заявка");
+
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.Token));
+        var result = await userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem();
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Register(RegisterDto registerDto)
+    {
+        // TODO: validate invitation token
         var user = new Account
         {
             UserName = registerDto.Email,
@@ -25,90 +103,40 @@ public class AccountController(SignInManager<Account> signInManager,
             LastName = registerDto.LastName,
         };
 
-        var result = await signInManager.UserManager.CreateAsync(user, registerDto.Password);
+        var result = await userManager.CreateAsync(user, registerDto.Password);
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            await SendConfirmationEmailAsync(user, registerDto.Email);
-
-            return Ok();
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem();
         }
-
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(error.Code, error.Description);
-        }
-
-        return ValidationProblem();
-    }
-
-    [AllowAnonymous]
-    [HttpGet("resendConfirmEmail")]
-    public async Task<ActionResult> ResendConfirmEmail(string? email, string? userId)
-    {
-        if (string.IsNullOrEmpty(email) && string.IsNullOrEmpty(userId))
-        {
-            return BadRequest("Email or UserId must be provided");
-        }
-
-        var user = await signInManager.UserManager.Users
-            .FirstOrDefaultAsync(x => x.Email == email || x.Id == userId);
-
-        if (user == null || string.IsNullOrEmpty(user.Email))
-            return BadRequest("User not found");
-
-        await SendConfirmationEmailAsync(user, user.Email);
 
         return Ok();
     }
 
-    private async Task SendConfirmationEmailAsync(Account user, string email)
-    {
-        var code = await signInManager.UserManager.GenerateEmailConfirmationTokenAsync(user);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-        var confirmEmailUrl = $"{config["ClientAppUrl"]}/confirm-email?userId={user.Id}&code={code}";
-
-        await emailSender.SendConfirmationLinkAsync(user, email, confirmEmailUrl);
-    }
-
-    [AllowAnonymous]
-    [HttpGet("user-info")]
-    public async Task<ActionResult> GetUserInfo()
-    {
-        if (User.Identity?.IsAuthenticated == false) return NoContent();
-
-        var user = await signInManager.UserManager.GetUserAsync(User);
-
-        if (user == null) return Unauthorized();
-
-        return Ok(new
-        {
-            user.Email,
-            user.Id,
-        });
-    }
-
-    [HttpPost("logout")]
-    public async Task<ActionResult> Logout()
-    {
-        await signInManager.SignOutAsync();
-
-        return NoContent();
-    }
-
     [HttpPost("change-password")]
-    public async Task<ActionResult> ChangePassword(ChangePasswordDto passwordDto)
+    [Authorize]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
-        var user = await signInManager.UserManager.GetUserAsync(User);
+        var user = await userManager.Users
+            .FirstOrDefaultAsync(u => u.Email == User.FindFirstValue(ClaimTypes.Email));
 
         if (user == null) return Unauthorized();
 
-        var result = await signInManager.UserManager
-            .ChangePasswordAsync(user, passwordDto.CurrentPassword, passwordDto.NewPassword);
+        var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
 
-        if (result.Succeeded) return Ok();
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem();
+        }
 
-        return BadRequest(result.Errors.First().Description);
+        return Ok();
     }
 }

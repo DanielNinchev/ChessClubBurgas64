@@ -13,16 +13,18 @@ export default function ResetPasswordForm() {
     const { resetPassword } = useAccount();
     const navigate = useNavigate();
 
-    const email = params.get('email');
-    const code = params.get('code');
+    // Read query params — the email link sends ?email=...&code=...
+    const email = params.get('email') ?? '';
+    const code = params.get('code') ?? '';
 
     if (!email || !code) return <Typography>Грешен код за потвърждение!</Typography>
 
     const onSubmit = async (data: ResetPasswordSchema) => {
         try {
-            await resetPassword.mutateAsync({
+            resetPassword.mutate({
                 email,
-                resetCode: code, newPassword: data.newPassword
+                token: code,
+                newPassword: data.newPassword
             }, {
                 onSuccess: () => {
                     toast.success('Паролата бе успешно променена - можете да се впишете сега');

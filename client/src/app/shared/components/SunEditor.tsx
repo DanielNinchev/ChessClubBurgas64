@@ -1,51 +1,39 @@
-import { useField } from 'formik';
-import React, { useEffect, useRef } from 'react';
-import suneditor from 'suneditor';
+import { Box, FormHelperText, FormLabel } from '@mui/material';
+import { FieldValues, useController, UseControllerProps } from 'react-hook-form';
+import SunEditorComponent from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
-import { align, font, fontColor, fontSize, hiliteColor, image, link, list, video } from 'suneditor/src/plugins';
 
-interface Props {
-    name: string;
-    label?: string;
-    initialValue?: string;
-}
+type Props<T extends FieldValues> = {
+    label: string;
+} & UseControllerProps<T>;
 
-const SunEditor: React.FC<Props> = ({ label, initialValue, ...props }) => {
-    const [field, meta, helpers] = useField(props);
-    const editorRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const editor = suneditor.create(editorRef.current!, {
-            height: '500',
-            plugins: [align, font, fontColor, fontSize, hiliteColor, image, link, list, video],
-            buttonList: [
-                ['undo', 'redo', 'bold', 'underline', 'italic', 'strike', 'list', 'align', 'font', 'fontColor', 'fontSize', 'hiliteColor', 'link', 'image', 'video']
-            ],
-        });
-
-        // Set initial content if initialValue is provided
-        if (initialValue) {
-            editor.setContents(initialValue);
-        }
-
-        editor.onChange = (contents: string) => {
-            helpers.setValue(contents);
-        };
-
-        return () => {
-            editor.destroy();
-        };
-    }, [initialValue, helpers]);
+export default function SunEditor<T extends FieldValues>(props: Props<T>) {
+    const { field, fieldState } = useController({ ...props });
 
     return (
-        <div>
-            {label && <label>{label}</label>}
-            <div ref={editorRef} />
-            {meta.touched && meta.error ? (
-                <div className="ui pointing red basic label">{meta.error}</div>
-            ) : null}
-        </div>
+        <Box>
+            <FormLabel sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
+                {props.label}
+            </FormLabel>
+            <SunEditorComponent
+                defaultValue={field.value || ''}
+                onChange={(content: string) => field.onChange(content)}
+                setOptions={{
+                    height: '300px',
+                    buttonList: [
+                        ['undo', 'redo'],
+                        ['font', 'fontSize', 'formatBlock'],
+                        ['bold', 'underline', 'italic', 'strike'],
+                        ['fontColor', 'hiliteColor'],
+                        ['align', 'list'],
+                        ['table', 'link', 'image'],
+                        ['fullScreen', 'preview'],
+                    ],
+                }}
+            />
+            {fieldState.error && (
+                <FormHelperText error>{fieldState.error.message}</FormHelperText>
+            )}
+        </Box>
     );
-};
-
-export default SunEditor;
+}

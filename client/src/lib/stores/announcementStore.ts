@@ -1,18 +1,44 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable } from 'mobx';
 
-export class AnnouncementStore {
+export default class AnnouncementStore {
+    // Existing properties used by useAnnouncements
     filter = 'all';
-    startDate = new Date().toISOString();
+    startDate: string | null = null;
+
+    // New properties for sidebar filtering/sorting
+    searchTerm = '';
+    sortBy = 'date_desc';
+    dateFilter = 'all';
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this);
     }
 
+    // Existing setters
     setFilter = (filter: string) => {
-        this.filter = filter
-    }
+        this.filter = filter;
+    };
 
-    setStartDate = (date: Date) => {
-        this.startDate = date.toISOString();
-    }
+    setStartDate = (date: string | null) => {
+        this.startDate = date;
+    };
+
+    // New setters for sidebar
+    setSearchTerm = (term: string) => {
+        this.searchTerm = term;
+    };
+
+    setSortBy = (sort: string) => {
+        this.sortBy = sort;
+    };
+
+    setDateFilter = (dateFilter: string) => {
+        this.dateFilter = dateFilter;
+    };
+
+    resetFilters = () => {
+        this.searchTerm = '';
+        this.sortBy = 'date_desc';
+        this.dateFilter = 'all';
+    };
 }

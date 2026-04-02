@@ -2,13 +2,13 @@ namespace Domain;
 
 public class Photo
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public required string Id { get; set; }
     public required string Url { get; set; }
-    public required string PublicId { get; set; }
+    public bool IsMain { get; set; }
 
-    // Navigation properties
-    public string? PuzzleId { get; set; }
-    public virtual Puzzle Puzzle { get; set; } = null!;
-    public string? AnnouncementId { get; set; }
+    // Foreign key
+    public required string AnnouncementId { get; set; }
+
+    // Navigation property
     public virtual Announcement Announcement { get; set; } = null!;
 }

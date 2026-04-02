@@ -1,6 +1,5 @@
 using Application.Announcements.DTOs;
 using Application.Core;
-using AutoMapper;
 using MediatR;
 using Persistence;
 
@@ -13,19 +12,20 @@ public class EditAnnouncement
         public required EditAnnouncementDto AnnouncementDto { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+    public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var announcement = await context.Announcements.FindAsync([request.AnnouncementDto.Id], cancellationToken);
+            var announcement = await context.Announcements
+                .FindAsync([request.AnnouncementDto.Id], cancellationToken);
 
-            if (announcement == null) return Result<Unit>.Failure("Announcement not found", 404);
+            if (announcement == null) return Result<Unit>.Failure("Обявата не е намерена", 404);
 
-            mapper.Map(request.AnnouncementDto, announcement);
+            request.AnnouncementDto.ApplyTo(announcement);
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
-            if (!result) return Result<Unit>.Failure("Failed to update the announcement", 400);
+            if (!result) return Result<Unit>.Failure("Неуспешно редактиране на обява", 400);
 
             return Result<Unit>.Success(Unit.Value);
         }

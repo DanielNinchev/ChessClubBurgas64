@@ -1,99 +1,129 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
 import agent from "../api/agent";
-import { ChangePasswordSchema } from "../schemas/changePasswordSchema";
-import { LoginSchema } from "../schemas/loginSchema";
-import { RegisterSchema } from "../schemas/registerSchema";
+import { User } from "../types";
 
 export const useAccount = () => {
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
 
-    const { data: currentUser, isLoading: loadingUserInfo } = useQuery({
+    const { data: currentUser, isLoading: loadingUser } = useQuery({
         queryKey: ['user'],
         queryFn: async () => {
             const response = await agent.get<User>('/account/user-info');
             return response.data;
         },
-        enabled: !queryClient.getQueryData(['user'])
-    })
+        retry: false,
+        staleTime: Infinity,
+    });
 
     const loginUser = useMutation({
-        mutationFn: async (creds: LoginSchema) => {
-            await agent.post('/login?useCookies=true', creds);
+        mutationFn: async (credentials: { email: string; password: string }) => {
+            await agent.post('/login?useCookies=true', credentials);
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['user']
-            });
-        }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
     });
 
     const registerUser = useMutation({
-        mutationFn: async (creds: RegisterSchema) => {
-            await agent.post('/account/register', creds)
-        }
-    })
+        mutationFn: async (data: {
+            email: string;
+            firstName: string;
+            middleName: string;
+            lastName: string;
+            password: string;
+            invitationToken: string;
+        }) => {
+            await agent.post('/account/register', data);
+        },
+    });
 
     const logoutUser = useMutation({
         mutationFn: async () => {
             await agent.post('/account/logout');
         },
         onSuccess: () => {
-            queryClient.removeQueries({ queryKey: ['user'] });
-            navigate('/');
-        }
-    })
+            queryClient.setQueryData(['user'], null);
+            queryClient.clear();
+        },
+    });
 
     const verifyEmail = useMutation({
-        mutationFn: async ({ userId, code }: { userId: string, code: string }) => {
-            await agent.get(`/confirmEmail?userId=${userId}&code=${code}`)
-        }
+        mutationFn: async (data: { userId: string; code: string }) => {
+            await agent.post('/account/verifyEmail', null, {
+                params: { userId: data.userId, code: data.code },
+            });
+        },
     });
 
     const resendConfirmationEmail = useMutation({
-        mutationFn: async ({ email, userId }: { email?: string, userId?: string | null }) => {
-            await agent.get(`/account/resendConfirmEmail`, {
-                params: {
-                    email,
-                    userId
-                }
-            })
+        mutationFn: async (data: { email?: string; userId?: string }) => {
+            await agent.get('/account/resendConfirmEmail', {
+                params: data,
+            });
         },
-        onSuccess: () => {
-            toast.success('Имейлът за потвърждение е изпратен. Моля, проверете електронната си поща.');
-        }
-    })
-
-    const changePassword = useMutation({
-        mutationFn: async (data: ChangePasswordSchema) => {
-            await agent.post('/account/change-password', data);
-        }
     });
 
     const forgotPassword = useMutation({
-        mutationFn: async (email: string) => {
-            await agent.post('/forgotPassword', { email })
-        }
-    })
-
-    const resetPassword = useMutation({
-        mutationFn: async (data: ResetPassword) => {
-            await agent.post('/resetPassword', data);
-        }
+        mutationFn: async (data: { email: string }) => {
+            await agent.post('/account/forgot-password', { email: data.email });
+        },
     });
 
+    const resetPassword = useMutation({
+        mutationFn: async (data: { email: string; token: string; newPassword: string }) => {
+            await agent.post('/account/reset-password', {
+                email: data.email,
+                token: data.token,
+                newPassword: data.newPassword,
+            });
+        },
+    });
+
+    const changePassword = useMutation({
+        mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+            await agent.post('/account/change-password', data);
+        },
+    });
+
+    const validateInvitation = useMutation({
+        mutationFn: async (token: string) => {
+            const response = await agent.get<{ email: string; role: string }>(
+                '/account/validate-invitation',
+                { params: { token } }
+            );
+            return response.data;
+        },
+    });
+
+    const createInvitation = useMutation({
+        mutationFn: async (data: { email: string; role: string; teacherId?: string }) => {
+            const response = await agent.post<{ registrationLink: string; expiresAt: string }>(
+                '/account/create-invitation',
+                data
+            );
+            return response.data;
+        },
+    });
+
+    const isAdmin = currentUser?.roles?.includes('Admin') ?? false;
+    const isTeacher = currentUser?.roles?.includes('Teacher') ?? false;
+    const isStudent = currentUser?.roles?.includes('Student') ?? false;
+
     return {
-        loginUser,
         currentUser,
-        logoutUser,
-        loadingUserInfo,
+        loadingUser,
+        loginUser,
         registerUser,
+        logoutUser,
         verifyEmail,
         resendConfirmationEmail,
-        changePassword,
         forgotPassword,
-        resetPassword
-    }
-}
+        resetPassword,
+        changePassword,
+        validateInvitation,
+        createInvitation,
+        isAdmin,
+        isTeacher,
+        isStudent,
+    };
+};

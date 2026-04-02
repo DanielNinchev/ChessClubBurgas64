@@ -1,8 +1,5 @@
 using Application.Announcements.DTOs;
 using Application.Core;
-using Application.Interfaces;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -16,17 +13,16 @@ public class GetAnnouncementDetails
         public required string Id { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor)
-        : IRequestHandler<Query, Result<AnnouncementDto>>
+    public class Handler(AppDbContext context) : IRequestHandler<Query, Result<AnnouncementDto>>
     {
         public async Task<Result<AnnouncementDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             var announcement = await context.Announcements
-                .ProjectTo<AnnouncementDto>(mapper.ConfigurationProvider,
-                    new { currentUserId = userAccessor.GetUserId() })
-                .FirstOrDefaultAsync(x => request.Id == x.Id, cancellationToken);
+                .Where(a => a.Id == request.Id)
+                .ProjectToDto()
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (announcement == null) return Result<AnnouncementDto>.Failure("announcement not found", 404);
+            if (announcement == null) return Result<AnnouncementDto>.Failure("Обявата не е намерена", 404);
 
             return Result<AnnouncementDto>.Success(announcement);
         }

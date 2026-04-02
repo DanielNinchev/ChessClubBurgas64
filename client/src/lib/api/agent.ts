@@ -29,7 +29,7 @@ agent.interceptors.response.use(
         if (import.meta.env.DEV) await sleep(1000);
         store.uiStore.isIdle();
 
-        const { status, data } = error.response;
+        const { status, data, config } = error.response;
         switch (status) {
             case 400:
                 if (data.errors) {
@@ -45,9 +45,14 @@ agent.interceptors.response.use(
                 }
                 break;
             case 401:
-                if (data.detail === 'NotAllowed') {
-                    throw new Error(data.detail)
-                } else {
+                // Silently ignore 401 for endpoints that don't require auth
+                if (
+                    !config.url?.includes('/account/user-info') &&
+                    !config.url?.includes('/login') &&
+                    !config.url?.includes('/account/forgot-password') &&
+                    !config.url?.includes('/account/reset-password') &&
+                    !config.url?.includes('/account/register')
+                ) {
                     toast.error('Не сте влезли в профила си!');
                 }
                 break;

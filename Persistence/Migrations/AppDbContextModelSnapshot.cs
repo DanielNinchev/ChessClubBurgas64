@@ -17,7 +17,7 @@ namespace Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.13")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -43,12 +43,6 @@ namespace Persistence.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsConfirmed")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
                         .HasColumnType("text");
@@ -82,9 +76,6 @@ namespace Persistence.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("StudentId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -117,7 +108,6 @@ namespace Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("MainPhotoUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Text")
@@ -135,6 +125,48 @@ namespace Persistence.Migrations
                     b.ToTable("Announcements");
                 });
 
+            modelBuilder.Entity("Domain.Invitation", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByAccountId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TeacherId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByAccountId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("Invitations");
+                });
+
             modelBuilder.Entity("Domain.Lesson", b =>
                 {
                     b.Property<string>("Id")
@@ -146,11 +178,17 @@ namespace Persistence.Migrations
                     b.Property<DateTime>("StartingTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("TeacherId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Topic")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Lessons");
                 });
@@ -158,14 +196,18 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.LessonStudent", b =>
                 {
                     b.Property<string>("LessonId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("StudentId")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasIndex("LessonId");
+                    b.Property<bool>("IsPresent")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.HasKey("LessonId", "StudentId");
 
                     b.HasIndex("StudentId");
 
@@ -178,14 +220,11 @@ namespace Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("AnnouncementId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PublicId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PuzzleId")
-                        .HasColumnType("text");
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -200,8 +239,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Puzzle", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -211,33 +254,24 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("PhotoId")
+                    b.Property<string>("Fen")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("PhotoUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Solution")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("PhotoId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.ToTable("Puzzles");
                 });
 
-            modelBuilder.Entity("Domain.Student", b =>
+            modelBuilder.Entity("Domain.StudentProfile", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -261,13 +295,13 @@ namespace Persistence.Migrations
                     b.Property<int?>("FideRating")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LessonId")
-                        .HasColumnType("text");
-
                     b.Property<int?>("PuzzlePoints")
                         .HasColumnType("integer");
 
                     b.Property<string>("School")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TeacherId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -275,9 +309,32 @@ namespace Persistence.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.HasIndex("LessonId");
+                    b.HasIndex("TeacherId");
 
-                    b.ToTable("Students");
+                    b.ToTable("StudentProfiles");
+                });
+
+            modelBuilder.Entity("Domain.TeacherProfile", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AccountId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Specialization")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.ToTable("TeacherProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -412,16 +469,44 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Invitation", b =>
+                {
+                    b.HasOne("Domain.Account", "CreatedByAccount")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.TeacherProfile", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("CreatedByAccount");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Domain.Lesson", b =>
+                {
+                    b.HasOne("Domain.TeacherProfile", "Teacher")
+                        .WithMany("Lessons")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("Domain.LessonStudent", b =>
                 {
                     b.HasOne("Domain.Lesson", "Lesson")
-                        .WithMany()
+                        .WithMany("LessonStudents")
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Student", "Student")
-                        .WithMany()
+                    b.HasOne("Domain.StudentProfile", "Student")
+                        .WithMany("LessonStudents")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -435,33 +520,38 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Announcement", "Announcement")
                         .WithMany("Photos")
-                        .HasForeignKey("AnnouncementId");
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Announcement");
                 });
 
-            modelBuilder.Entity("Domain.Puzzle", b =>
-                {
-                    b.HasOne("Domain.Photo", "Photo")
-                        .WithOne("Puzzle")
-                        .HasForeignKey("Domain.Puzzle", "PhotoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Photo");
-                });
-
-            modelBuilder.Entity("Domain.Student", b =>
+            modelBuilder.Entity("Domain.StudentProfile", b =>
                 {
                     b.HasOne("Domain.Account", "Account")
-                        .WithOne("Student")
-                        .HasForeignKey("Domain.Student", "AccountId")
+                        .WithOne("StudentProfile")
+                        .HasForeignKey("Domain.StudentProfile", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Lesson", null)
+                    b.HasOne("Domain.TeacherProfile", "Teacher")
                         .WithMany("Students")
-                        .HasForeignKey("LessonId");
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Domain.TeacherProfile", b =>
+                {
+                    b.HasOne("Domain.Account", "Account")
+                        .WithOne("TeacherProfile")
+                        .HasForeignKey("Domain.TeacherProfile", "AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Account");
                 });
@@ -519,7 +609,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Account", b =>
                 {
-                    b.Navigation("Student");
+                    b.Navigation("StudentProfile");
+
+                    b.Navigation("TeacherProfile");
                 });
 
             modelBuilder.Entity("Domain.Announcement", b =>
@@ -529,13 +621,19 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Lesson", b =>
                 {
-                    b.Navigation("Students");
+                    b.Navigation("LessonStudents");
                 });
 
-            modelBuilder.Entity("Domain.Photo", b =>
+            modelBuilder.Entity("Domain.StudentProfile", b =>
                 {
-                    b.Navigation("Puzzle")
-                        .IsRequired();
+                    b.Navigation("LessonStudents");
+                });
+
+            modelBuilder.Entity("Domain.TeacherProfile", b =>
+                {
+                    b.Navigation("Lessons");
+
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,8 +3,52 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# dotenv files
+# Ignore .NET build output
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug*/
+[Rr]elease*/
+
+# Ignore VS/VSCode/JetBrains IDE files
+.vs/
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Ignore frontend build and dependencies
+client/node_modules/
+client/dist/
+client/build/
+
+# Ignore environment and secret files
 .env
+.env.*
+client/.env
+client/.env.*
+
+# Ignore local database and log files
+*.db
+*.db-shm
+*.db-wal
+*.log
+
+# Ignore OS junk
+.DS_Store
+Thumbs.db
+
+# Ignore API build output
+API/bin/
+API/obj/
+API/wwwroot/assets/
+API/wwwroot/*.map
+
+# Ignore migration snapshots if you want (optional)
+# Persistence/Migrations/
 
 # User-specific files
 *.rsuser
@@ -485,7 +529,6 @@ $RECYCLE.BIN/
 API/appsettings.json
 API/reactivities.db
 API/reactivities.db-shm
-.gitignore
 /API/appsettings.Development.json
 /ChessClubBurgas64.Web/appsettings.Development.json
 /ChessClubBurgas64.Web/Properties/launchSettings.json

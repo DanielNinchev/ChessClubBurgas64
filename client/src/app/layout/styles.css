@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'Simbal';
+    src: url('/fonts/Simbal-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 .react-calendar {
     width: 100% !important;
     border: none !important;

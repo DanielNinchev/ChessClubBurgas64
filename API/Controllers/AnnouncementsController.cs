@@ -11,9 +11,9 @@ public class AnnouncementsController : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<PagedList<AnnouncementDto, DateTime?>>> GetAnnouncements(
-            [FromQuery] AnnouncementParams AnnouncementParams)
+            [FromQuery] AnnouncementParams announcementParams)
     {
-        return HandleResult(await Mediator.Send(new GetAnnouncementList.Query { Params = AnnouncementParams }));
+        return HandleResult(await Mediator.Send(new GetAnnouncementList.Query { Params = announcementParams }));
     }
 
     [HttpGet("{id}")]
@@ -23,17 +23,24 @@ public class AnnouncementsController : BaseApiController
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> CreateAnnouncement(CreateAnnouncementDto AnnouncementDto)
+    [Authorize(Policy = "IsChessClubAdmin")]
+    public async Task<ActionResult<string>> CreateAnnouncement(
+        [FromForm] CreateAnnouncementDto announcementDto,
+        [FromForm] IFormFile file)
     {
-        return HandleResult(await Mediator.Send(new CreateAnnouncement.Command { AnnouncementDto = AnnouncementDto }));
+        return HandleResult(await Mediator.Send(new CreateAnnouncement.Command
+        {
+            AnnouncementDto = announcementDto,
+            File = file,
+        }));
     }
 
     [HttpPut("{id}")]
     [Authorize(Policy = "IsChessClubAdmin")]
-    public async Task<ActionResult> EditAnnouncement(string id, EditAnnouncementDto Announcement)
+    public async Task<ActionResult> EditAnnouncement(string id, EditAnnouncementDto announcementDto)
     {
-        Announcement.Id = id;
-        return HandleResult(await Mediator.Send(new EditAnnouncement.Command { AnnouncementDto = Announcement }));
+        announcementDto.Id = id;
+        return HandleResult(await Mediator.Send(new EditAnnouncement.Command { AnnouncementDto = announcementDto }));
     }
 
     [HttpDelete("{id}")]
@@ -41,5 +48,16 @@ public class AnnouncementsController : BaseApiController
     public async Task<ActionResult> DeleteAnnouncement(string id)
     {
         return HandleResult(await Mediator.Send(new DeleteAnnouncement.Command { Id = id }));
+    }
+
+    [HttpPost("{id}/photos")]
+    [Authorize(Policy = "IsChessClubAdmin")]
+    public async Task<ActionResult<PhotoDto>> AddPhoto(string id, [FromForm] IFormFile file)
+    {
+        return HandleResult(await Mediator.Send(new AddAnnouncementPhoto.Command
+        {
+            AnnouncementId = id,
+            File = file,
+        }));
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Persistence;
 using Resend;
 
@@ -29,19 +30,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
     string connStr;
 
-    // Depending on if in development or production, use either FlyIO
-    // connection string, or development connection string from env var.
     if (env == "Development")
     {
-        // Use connection string from file.
         connStr = builder.Configuration.GetConnectionString("DefaultConnection")!;
     }
     else
     {
-        // Use connection string provided at runtime by Flyio.
         var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-        // Parse connection URL to connection string for Npgsql
         connUrl = connUrl!.Replace("postgres://", string.Empty);
         var pgUserPass = connUrl.Split("@")[0];
         var pgHostPortDb = connUrl.Split("@")[1];
@@ -55,8 +51,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};";
     }
 
-    // Whether the connection string came from the local development configuration file
-    // or from the environment variable from FlyIO, use it to set up your DbContext.
     options.UseNpgsql(connStr);
 });
 builder.Services.AddCors();
@@ -65,20 +59,29 @@ builder.Services.AddMediatR(x =>
     x.RegisterServicesFromAssemblyContaining<GetAnnouncementList.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
+
+// Resend email - all singletons to avoid scoped resolution from MapIdentityApi
 builder.Services.AddHttpClient<ResendClient>();
-builder.Services.Configure<ResendClientOptions>(opt =>
+var resendApiToken = builder.Configuration["Resend:ApiToken"]!;
+builder.Services.AddSingleton<IOptionsSnapshot<ResendClientOptions>>(
+    new SingletonOptionsSnapshot<ResendClientOptions>(
+        new ResendClientOptions { ApiToken = resendApiToken }));
+builder.Services.AddSingleton<IResend>(sp =>
 {
-    opt.ApiToken = builder.Configuration["Resend:ApiToken"]!;
+    var options = sp.GetRequiredService<IOptionsSnapshot<ResendClientOptions>>();
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient(nameof(ResendClient));
+    return new ResendClient(options, httpClient);
 });
-builder.Services.AddTransient<IResend, ResendClient>();
-builder.Services.AddTransient<IEmailSender<Account>, EmailSender>();
+builder.Services.AddSingleton<IEmailSender<Account>>(sp =>
+{
+    var resend = sp.GetRequiredService<IResend>();
+    var config = sp.GetRequiredService<IConfiguration>();
+    return new EmailSender(resend, config);
+});
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddMaps(typeof(MappingProfiles).Assembly);
-});
 builder.Services.AddValidatorsFromAssemblyContaining<CreateAnnouncementValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<Account>(opt =>
@@ -87,7 +90,9 @@ builder.Services.AddIdentityApiEndpoints<Account>(opt =>
     opt.SignIn.RequireConfirmedEmail = true;
 })
 .AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<AppDbContext>();
+.AddEntityFrameworkStores<AppDbContext>()
+.AddSignInManager<SignInManager<Account>>();
+
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("IsChessClubAdmin", policy =>
     {
@@ -113,9 +118,11 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
-app.MapGroup("api").MapIdentityApi<Account>(); // api/login
-app.MapFallbackToController("Index", "Fallback");
+app.MapGroup("api").MapIdentityApi<Account>();
 
+app.MapFallbackToFile("index.html");
+
+// Seed data
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
@@ -123,12 +130,31 @@ try
 {
     var context = services.GetRequiredService<AppDbContext>();
     var userManager = services.GetRequiredService<UserManager<Account>>();
-    await context.Database.MigrateAsync();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    try
+    {
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(ex, "Migration skipped - database may already be up to date.");
+    }
+
+    await Seeder.SeedData(userManager, roleManager);
 }
 catch (Exception ex)
 {
     var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred during migration.");
+    logger.LogError(ex, "An error occurred during seeding.");
 }
 
 app.Run();
+
+// Helper: wraps IOptionsSnapshot as a singleton
+public class SingletonOptionsSnapshot<T>(T value) : IOptionsSnapshot<T> where T : class, new()
+{
+    public T Value => value;
+    public T Get(string? name) => value;
+}

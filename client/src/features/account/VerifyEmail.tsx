@@ -32,7 +32,7 @@ export default function VerifyEmail() {
                             Неуспешно потвърждение. Можете да опитате да изпратите отново линка за потвърждение на електронната си поща.
                         </Typography>
                         <Button
-                            onClick={() => resendConfirmationEmail.mutate({ userId })}
+                            onClick={() => resendConfirmationEmail.mutate({ userId: userId ?? undefined })}
                             disabled={resendConfirmationEmail.isPending}
                         >
                             Препращане на имейла за потвърждение

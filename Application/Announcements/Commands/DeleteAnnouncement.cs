@@ -1,5 +1,7 @@
 using Application.Core;
+using Application.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Announcements.Commands;
@@ -11,20 +13,25 @@ public class DeleteAnnouncement
         public required string Id { get; set; }
     }
 
-    public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
+    public class Handler(AppDbContext context, IPhotoService photoService) : IRequestHandler<Command, Result<Unit>>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             var announcement = await context.Announcements
-                .FindAsync([request.Id], cancellationToken);
+                .Include(a => a.Photos)
+                .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
 
-            if (announcement == null) return Result<Unit>.Failure("Announcement not found", 404);
+            if (announcement == null)
+                return Result<Unit>.Failure("Обявата не е намерена", 404);
 
-            context.Remove(announcement);
+            // Delete all photos from Cloudinary
+            foreach (var photo in announcement.Photos)
+            {
+                await photoService.DeletePhotoAsync(photo.Id);
+            }
 
-            var result = await context.SaveChangesAsync(cancellationToken) > 0;
-
-            if (!result) return Result<Unit>.Failure("Failed to delete the announcement", 400);
+            context.Announcements.Remove(announcement);
+            await context.SaveChangesAsync(cancellationToken);
 
             return Result<Unit>.Success(Unit.Value);
         }

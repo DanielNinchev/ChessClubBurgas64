@@ -1,8 +1,5 @@
 using Application.Announcements.DTOs;
 using Application.Core;
-using Application.Interfaces;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -11,23 +8,33 @@ namespace Application.Announcements.Queries;
 
 public class GetAnnouncementList
 {
-    public class Query : IRequest<Result<PagedList<AnnouncementDto, DateTime?>>> 
+    public class Query : IRequest<Result<PagedList<AnnouncementDto, DateTime?>>>
     {
         public required AnnouncementParams Params { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) :  IRequestHandler<Query, Result<PagedList<AnnouncementDto, DateTime?>>>
+    public class Handler(AppDbContext context) : IRequestHandler<Query, Result<PagedList<AnnouncementDto, DateTime?>>>
     {
         public async Task<Result<PagedList<AnnouncementDto, DateTime?>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var query = context.Announcements
-                .OrderBy(x => x.Date)
-                .Where(x => x.Date >= (request.Params.Cursor ?? request.Params.StartDate))
+                .Include(a => a.Photos)
+                .OrderByDescending(a => a.Date)
                 .AsQueryable();
 
-            var projectedAnnouncements = query.ProjectTo<AnnouncementDto>(mapper.ConfigurationProvider,  new {currentUserId = userAccessor.GetUserId()});
-            var announcements = await projectedAnnouncements
+            if (request.Params.StartDate != default)
+            {
+                query = query.Where(a => a.Date >= request.Params.StartDate);
+            }
+
+            if (request.Params.Cursor.HasValue)
+            {
+                query = query.Where(a => a.Date < request.Params.Cursor.Value);
+            }
+
+            var announcements = await query
                 .Take(request.Params.PageSize + 1)
+                .ProjectToDto()
                 .ToListAsync(cancellationToken);
 
             DateTime? nextCursor = null;
@@ -41,9 +48,8 @@ public class GetAnnouncementList
                 new PagedList<AnnouncementDto, DateTime?>
                 {
                     Items = announcements,
-                    NextCursor = nextCursor
-                }
-            );
+                    NextCursor = nextCursor,
+                });
         }
     }
 }

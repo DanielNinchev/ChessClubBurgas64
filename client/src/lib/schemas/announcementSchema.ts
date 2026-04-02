@@ -1,18 +1,10 @@
 import { z } from 'zod';
-import { requiredString } from '../util/util';
 
 export const announcementSchema = z.object({
-    title: requiredString('Title'),
-    description: requiredString('Description'),
-    text: requiredString('Text'),
-    date: z.coerce.date({
-        message: 'Датата е задължителна'
-    }),
-    mainPhotoUrl: requiredString('MainPhotoUrl'),
-    photo: z.object({
-        url: requiredString('Url'),
-        isMain: z.boolean().optional()
-    })
-})
+    title: z.string().min(1, 'Заглавието е задължително'),
+    description: z.string().min(1, 'Описанието е задължително'),
+    text: z.string().min(1, 'Текстът е задължителен'),
+    date: z.coerce.date({ required_error: 'Датата е задължителна' }),
+});
 
 export type AnnouncementSchema = z.infer<typeof announcementSchema>;

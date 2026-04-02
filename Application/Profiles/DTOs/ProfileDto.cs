@@ -1,15 +1,12 @@
-﻿namespace Application.Profiles.DTOs
+﻿namespace Application.Profiles.DTOs;
+
+public class ProfileDto
 {
-    public class ProfileDto
-    {
-        public required string Id { get; set; }
-        public required string Email { get; set; }
-        public required string FirstName { get; set; }
-        public required string MiddleName { get; set; }
-        public required string LastName { get; set; }
-        public required string PhoneNumber { get; set; }
-        public required DateTime BirthDate { get; set; }
-        public required string? Address { get; set; }
-        public required string? School { get; set; }
-    }
+    public string Id { get; set; } = string.Empty;
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
+    public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
+    public List<string> Roles { get; set; } = [];
 }

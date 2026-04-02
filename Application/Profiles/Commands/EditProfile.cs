@@ -1,7 +1,6 @@
 using Application.Core;
 using Application.Interfaces;
 using Application.Profiles.DTOs;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -12,22 +11,42 @@ public class EditProfile
 {
     public class Command : IRequest<Result<Unit>>
     {
-        public required ProfileDto ProfileData { get; set; }
+        public required EditProfileDto ProfileData { get; set; }
     }
 
-    public class Handler(AppDbContext context, IUserAccessor userAccessor, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+    public class Handler(AppDbContext context, IUserAccessor userAccessor) : IRequestHandler<Command, Result<Unit>>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             var user = await userAccessor.GetUserAsync();
-            user = mapper.Map(request.ProfileData, user);
-            context.Entry(user).State = EntityState.Modified;
+
+            var account = await context.Users
+                .Include(u => u.StudentProfile)
+                .Include(u => u.TeacherProfile)
+                .FirstOrDefaultAsync(u => u.Id == user.Id, cancellationToken);
+
+            if (account == null)
+                return Result<Unit>.Failure("Профилът не е намерен", 404);
+
+            // Apply common fields
+            request.ProfileData.ApplyTo(account);
+
+            // Apply role-specific fields
+            if (account.StudentProfile != null)
+            {
+                request.ProfileData.ApplyTo(account.StudentProfile);
+            }
+
+            if (account.TeacherProfile != null)
+            {
+                request.ProfileData.ApplyTo(account.TeacherProfile);
+            }
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
             return result
                 ? Result<Unit>.Success(Unit.Value)
-                : Result<Unit>.Failure("Failed to update profile", 400);
+                : Result<Unit>.Failure("Неуспешно обновяване на профила", 400);
         }
     }
 }

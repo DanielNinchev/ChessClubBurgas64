@@ -1,50 +1,33 @@
-import { Person } from "@mui/icons-material";
-import { Box, Card, CardContent, CardMedia, Divider, Typography } from "@mui/material";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { Link } from "react-router";
+import { Profile } from '../../lib/types';
 
 type Props = {
-    profile: Profile
+    profile: Profile;
 }
 
 export default function ProfileCard({ profile }: Props) {
+    const fullName = [profile.firstName, profile.middleName, profile.lastName].filter(Boolean).join(' ');
+
     return (
-        <Link to={`/profiles/${profile.id}`} style={{ textDecoration: 'none' }}>
-            <Card
-                sx={{
-                    borderRadius: 3, p: 3,
-                    maxWidth: 250,
-                    textDecoration: 'none'
-                }}
-                elevation={4}
-            >
-                <CardMedia
-                    component='img'
-                    src={profile?.imageUrl || '/images/user.png'}
-                    sx={{ width: '100%', zIndex: 50 }}
-                    alt={profile.displayName + ' image'}
-                />
-                <CardContent>
-                    <Box display='flex' flexDirection='column' gap={1}>
-                        <Typography variant="h5">{profile.displayName}</Typography>
-                        {profile.bio && (
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {profile.bio}
-                            </Typography>
-                        )}
-                    </Box>
-                </CardContent>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}>
-                    <Person />
-                </Box>
-            </Card>
-        </Link>
-    )
+        <Card
+            component={Link}
+            to={`/profiles/${profile.id}`}
+            sx={{ textDecoration: 'none', maxWidth: 250 }}
+        >
+            <CardMedia
+                component="img"
+                height="200"
+                image={'/images/user.png'}
+                alt={fullName + ' image'}
+            />
+            <CardContent>
+                <Typography variant="h5">{fullName}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {profile.roles?.includes('Teacher') ? 'Учител' :
+                        profile.roles?.includes('Student') ? 'Ученик' : ''}
+                </Typography>
+            </CardContent>
+        </Card>
+    );
 }

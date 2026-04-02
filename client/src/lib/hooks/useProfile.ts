@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import agent from "../api/agent";
 import { EditProfileSchema } from "../schemas/editProfileSchema";
+import { Photo, Profile, User } from '../types';
 
 export const useProfile = (id?: string, predicate?: string) => {
     const [filter, setFilter] = useState<string | null>(null);
@@ -34,22 +35,9 @@ export const useProfile = (id?: string, predicate?: string) => {
             });
             return response.data;
         },
-        onSuccess: async (photo: Photo) => {
+        onSuccess: async () => {
             await queryClient.invalidateQueries({
                 queryKey: ['photos', id]
-            });
-            queryClient.setQueryData(['user'], (data: User) => {
-                if (!data) return data;
-                return {
-                    ...data,
-                }
-            });
-            queryClient.setQueryData(['profile', id], (data: Profile) => {
-                if (!data) return data;
-                return {
-                    ...data,
-                    imageUrl: data.imageUrl ?? photo.url
-                }
             });
         }
     })
@@ -58,21 +46,8 @@ export const useProfile = (id?: string, predicate?: string) => {
         mutationFn: async (photo: Photo) => {
             await agent.put(`/profiles/${photo.id}/setMain`)
         },
-        onSuccess: (_, photo) => {
-            queryClient.setQueryData(['user'], (userData: User) => {
-                if (!userData) return userData;
-                return {
-                    ...userData,
-                    imageUrl: photo.url
-                }
-            });
-            queryClient.setQueryData(['profile', id], (profile: Profile) => {
-                if (!profile) return profile;
-                return {
-                    ...profile,
-                    imageUrl: photo.url
-                }
-            })
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['profile', id] });
         }
     })
 
@@ -88,23 +63,31 @@ export const useProfile = (id?: string, predicate?: string) => {
     });
 
     const updateProfile = useMutation({
-        mutationFn: async (profile: EditProfileSchema) => {
-            await agent.put(`/profiles`, profile);
+        mutationFn: async (profileData: EditProfileSchema) => {
+            await agent.put(`/profiles`, profileData);
         },
-        onSuccess: (_, profile) => {
+        onSuccess: (_, profileData) => {
             queryClient.setQueryData(['profile', id], (data: Profile) => {
                 if (!data) return data;
                 return {
                     ...data,
-                    displayName: profile.displayName,
-                    bio: profile.bio
+                    firstName: profileData.firstName,
+                    middleName: profileData.middleName,
+                    lastName: profileData.lastName,
+                    phoneNumber: profileData.phoneNumber,
+                    bio: profileData.bio,
+                    address: profileData.address,
+                    school: profileData.school,
+                    specialization: profileData.specialization,
                 }
             });
             queryClient.setQueryData(['user'], (userData: User) => {
                 if (!userData) return userData;
                 return {
                     ...userData,
-                    displayName: profile.displayName
+                    firstName: profileData.firstName,
+                    middleName: profileData.middleName,
+                    lastName: profileData.lastName,
                 }
             });
         }

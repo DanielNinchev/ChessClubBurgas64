@@ -1,15 +1,22 @@
-import { Typography } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { Navigate, Outlet, useLocation } from "react-router";
 import { useAccount } from "../../lib/hooks/useAccount";
 
 export default function RequireAuth() {
-    const { currentUser, loadingUserInfo } = useAccount();
+    const { currentUser } = useAccount();
     const location = useLocation();
 
-    if (loadingUserInfo) return <Typography>Зареждане...</Typography>
-    if (!currentUser) return <Navigate to='/login' state={{ from: location }} />
+    if (currentUser === undefined) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress color="primary" />
+            </Box>
+        );
+    }
 
-    return (
-        <Outlet />
-    )
+    if (!currentUser) {
+        return <Navigate to="/login" state={{ from: location }} />;
+    }
+
+    return <Outlet />;
 }

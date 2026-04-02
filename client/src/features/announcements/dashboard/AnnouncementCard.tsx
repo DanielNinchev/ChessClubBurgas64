@@ -1,59 +1,109 @@
-import { AccessTime, Place } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, CardHeader, Divider, Typography } from "@mui/material";
-import { Link } from "react-router";
-import { formatDate } from "../../../lib/util/util";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
+  Typography,
+} from '@mui/material';
+import { Link } from 'react-router';
+import { Announcement } from '../../../lib/types';
 
-type Props = {
-  announcement: Announcement
+interface Props {
+  announcement: Announcement;
 }
 
 export default function AnnouncementCard({ announcement }: Props) {
-
+  const formattedDate = new Date(announcement.date).toLocaleDateString('bg-BG', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
-    <Card elevation={3} sx={{ borderRadius: 3 }}>
-      <Box display='flex' alignItems='center' justifyContent='space-between'>
-        <CardHeader
-
+    <Card
+      component={Link}
+      to={`/announcements/${announcement.id}`}
+      sx={{
+        textDecoration: 'none',
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        overflow: 'hidden',
+        cursor: 'pointer',
+      }}
+    >
+      {/* Image */}
+      {announcement.mainPhotoUrl && (
+        <CardMedia
+          component="img"
+          image={announcement.mainPhotoUrl}
+          alt={announcement.title}
+          sx={{
+            width: { xs: '100%', sm: 240 },
+            height: { xs: 200, sm: 'auto' },
+            objectFit: 'cover',
+            minHeight: { sm: 180 },
+          }}
         />
-        <Box display='flex' flexDirection='column' gap={2} mr={2}>
+      )}
 
+      {/* Content */}
+      <CardContent
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          p: 3,
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h6"
+            color="primary.dark"
+            sx={{
+              mb: 1,
+              fontWeight: 700,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {announcement.title}
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: 2,
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              lineHeight: 1.7,
+            }}
+          >
+            {announcement.description}
+          </Typography>
         </Box>
-      </Box>
 
-      <Divider sx={{ mb: 3 }} />
-
-      <CardContent sx={{ p: 0 }}>
-        <Box display='flex' alignItems='center' mb={2} px={2}>
-          <Box display='flex' flexGrow={0} alignItems='center'>
-            <AccessTime sx={{ mr: 1 }} />
-            <Typography variant="body2" noWrap>
-              {formatDate(announcement.date)}
-            </Typography>
-          </Box>
-
-          <Place sx={{ ml: 3, mr: 1 }} />
-
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 'auto' }}>
+          <Chip
+            icon={<CalendarTodayIcon sx={{ fontSize: 14 }} />}
+            label={formattedDate}
+            size="small"
+            variant="outlined"
+            sx={{
+              borderRadius: 2,
+              color: 'text.secondary',
+              borderColor: 'divider',
+            }}
+          />
         </Box>
-        <Divider />
-        <Box display='flex' gap={2} sx={{ backgroundColor: 'grey.200', py: 3, pl: 3 }}>
-
-        </Box>
-      </CardContent>
-      <CardContent sx={{ pb: 2 }}>
-        <Typography variant="body2">
-          {announcement.description}
-        </Typography>
-        <Button
-          component={Link}
-          to={`/announcements/${announcement.id}`}
-          size="medium"
-          variant="contained"
-          sx={{ display: 'flex', justifySelf: 'self-end', borderRadius: 3 }}
-        >
-          View
-        </Button>
       </CardContent>
     </Card>
-  )
+  );
 }

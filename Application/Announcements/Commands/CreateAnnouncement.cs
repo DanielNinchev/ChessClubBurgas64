@@ -1,9 +1,9 @@
 using Application.Announcements.DTOs;
 using Application.Core;
 using Application.Interfaces;
-using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Persistence;
 
 namespace Application.Announcements.Commands;
@@ -13,20 +13,36 @@ public class CreateAnnouncement
     public class Command : IRequest<Result<string>>
     {
         public required CreateAnnouncementDto AnnouncementDto { get; set; }
+        public IFormFile? File { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor)
-        : IRequestHandler<Command, Result<string>>
+    public class Handler(AppDbContext context, IPhotoService photoService) : IRequestHandler<Command, Result<string>>
     {
         public async Task<Result<string>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var announcement = mapper.Map<Announcement>(request.AnnouncementDto);
+            if (request.File == null)
+                return Result<string>.Failure("Снимката е задължителна", 400);
+
+            var photoUploadResult = await photoService.UploadPhotoAsync(request.File);
+
+            if (photoUploadResult == null)
+                return Result<string>.Failure("Неуспешно качване на снимка", 400);
+
+            var announcement = request.AnnouncementDto.ToEntity();
+            announcement.MainPhotoUrl = photoUploadResult.Url.ToString();
+
+            var photo = new Photo
+            {
+                Id = photoUploadResult.PublicId,
+                Url = photoUploadResult.Url.ToString(),
+                IsMain = true,
+                AnnouncementId = announcement.Id,
+            };
+
+            announcement.Photos.Add(photo);
 
             context.Announcements.Add(announcement);
-
-            var result = await context.SaveChangesAsync(cancellationToken) > 0;
-
-            if (!result) return Result<string>.Failure("Failed to create the announcement", 400);
+            await context.SaveChangesAsync(cancellationToken);
 
             return Result<string>.Success(announcement.Id);
         }

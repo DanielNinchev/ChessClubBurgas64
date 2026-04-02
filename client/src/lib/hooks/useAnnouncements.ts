@@ -1,105 +1,107 @@
-import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
-import { useLocation } from "react-router";
-import { useAccount } from "./useAccount";
-import { useStore } from "./useStore";
-import { FieldValues } from "react-hook-form";
+import { Announcement, PagedResult, Photo } from "../types";
 
 export const useAnnouncements = (id?: string) => {
-    const {announcementStore: {filter, startDate}} = useStore();
     const queryClient = useQueryClient();
-    const { currentUser } = useAccount();
-    const location = useLocation();
 
-    const { data: announcementsGroup, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } 
-        = useInfiniteQuery<PagedList<Announcement, string>>({
-        queryKey: ['announcements', filter, startDate],
-        queryFn: async ({pageParam = null}) => {
-            const response = await agent.get<PagedList<Announcement, string>>('/announcements', {
-                params: {
-                    cursor: pageParam,
-                    pageSize: 3,
-                    filter,
-                    startDate
-                }
-            });
+    const {
+        data: announcementsGroup,
+        isLoading,
+        isFetchingNextPage,
+        fetchNextPage,
+        hasNextPage,
+    } = useInfiniteQuery<PagedResult<Announcement, string | null>>({
+        queryKey: ['announcements'],
+        queryFn: async ({ pageParam }) => {
+            const params = new URLSearchParams();
+            if (pageParam) params.append('cursor', pageParam as string);
+            const response = await agent.get<PagedResult<Announcement, string | null>>(
+                `/announcements?${params.toString()}`
+            );
             return response.data;
         },
-        placeholderData: keepPreviousData,
-        initialPageParam: null,
+        initialPageParam: null as string | null,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        enabled: !id && location.pathname === '/announcements' && !!currentUser,
-        select: data => ({
-            ...data,
-            pages: data.pages.map((page) => ({
-                ...page,
-                items: page.items.map(announcement => {
-                    //const mainPhoto = announcement.photos.find(x => x.isMain === true);
-                    return {
-                        ...announcement
-                    }
-                })
-            }))
-        })
     });
 
-    const { data: announcement } = useQuery({
+    const { data: announcement, isLoading: loadingAnnouncement } = useQuery({
         queryKey: ['announcements', id],
         queryFn: async () => {
             const response = await agent.get<Announcement>(`/announcements/${id}`);
             return response.data;
         },
-        enabled: !!id && !!currentUser,
-        select: data => {
-            return {
-                ...data,
-            }
-        }
-    })
-
-    const updateAnnouncement = useMutation({
-        mutationFn: async (announcement: Announcement) => {
-            await agent.put('/announcements', announcement)
-        },
-        onSuccess: async () => {
-            await queryClient.refetchQueries({
-                queryKey: ['announcements']
-            })
-        }
-    })
+        enabled: !!id,
+    });
 
     const createAnnouncement = useMutation({
-        mutationFn: async (announcement: FieldValues) => {
-            const response = await agent.post('/announcements', announcement);
+        mutationFn: async (data: { title: string; description: string; text: string; date: Date; file: Blob }) => {
+            const formData = new FormData();
+            formData.append('title', data.title);
+            formData.append('description', data.description);
+            formData.append('text', data.text);
+            formData.append('date', data.date.toISOString());
+            formData.append('file', data.file);
+
+            const response = await agent.post<string>('/announcements', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             return response.data;
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['announcements']
-            })
-        }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['announcements'] });
+        },
+    });
+
+    const updateAnnouncement = useMutation({
+        mutationFn: async (data: { id: string; title: string; description: string; text: string; date: string }) => {
+            await agent.put(`/announcements/${data.id}`, {
+                title: data.title,
+                description: data.description,
+                text: data.text,
+                date: data.date,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['announcements'] });
+            if (id) queryClient.invalidateQueries({ queryKey: ['announcements', id] });
+        },
     });
 
     const deleteAnnouncement = useMutation({
-        mutationFn: async (id: string) => {
-            await agent.delete(`/announcements/${id}`)
+        mutationFn: async (announcementId: string) => {
+            await agent.delete(`/announcements/${announcementId}`);
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['announcements']
-            })
-        }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['announcements'] });
+        },
+    });
+
+    const uploadPhoto = useMutation({
+        mutationFn: async (data: { announcementId: string; file: Blob }) => {
+            const formData = new FormData();
+            formData.append('file', data.file);
+            const response = await agent.post<Photo>(`/announcements/${data.announcementId}/photos`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data;
+        },
+        onSuccess: () => {
+            if (id) queryClient.invalidateQueries({ queryKey: ['announcements', id] });
+        },
     });
 
     return {
         announcementsGroup,
+        isLoading,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,
-        isLoading,
-        updateAnnouncement,
+        announcement,
+        loadingAnnouncement,
         createAnnouncement,
+        updateAnnouncement,
         deleteAnnouncement,
-        announcement
-    }
-}
+        uploadPhoto,
+    };
+};

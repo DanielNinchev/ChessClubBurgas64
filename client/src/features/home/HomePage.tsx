@@ -1,44 +1,76 @@
-import { Group } from "@mui/icons-material";
-import { Box, Button, Paper, Typography } from "@mui/material";
-import { Link } from "react-router";
+import LoginIcon from '@mui/icons-material/Login';
+import { Box, Button, Container, Typography } from '@mui/material';
+import { NavLink } from 'react-router';
 
 export default function HomePage() {
   return (
-    <Paper
+    <Container
+      maxWidth="md"
       sx={{
-        color: 'white',
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
         alignItems: 'center',
-        alignContent: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        backgroundImage: 'linear-gradient(135deg, #182a73 0%, #218aae 69%, #20a7ac 89%)'
+        minHeight: '100vh',
+        textAlign: 'center',
       }}
     >
-      <Box sx={{
-        display: 'flex', alignItems: 'center', alignContent: 'center',
-        color: 'white', gap: 3
-      }}
+      {/* Club Logo - large, no background/border */}
+      <Box
+        component="img"
+        src="/images/logo.png"
+        alt="ЛОГО БУРГАС-64"
+        sx={{
+          width: { xs: '60%', sm: '50%', md: '40%' },
+          maxWidth: 320,
+          height: 'auto',
+          objectFit: 'contain',
+          mb: 2,
+        }}
+      />
+
+      <Typography
+        variant="h3"
+        color="primary.dark"
+        sx={{ fontWeight: 800, mb: 1 }}
       >
-        <Group sx={{ height: 110, width: 110 }} />
-        <Typography variant="h1">
-          ШАХМАТЕН КЛУБ
-        </Typography>
-      </Box>
-      <Typography variant="h2">
-        "Бургас-64"
+        ШАХМАТЕН КЛУБ
       </Typography>
-      <Button
-        component={Link}
-        to='/announcements'
-        size="large"
-        variant="contained"
-        sx={{ height: 80, borderRadius: 4, fontSize: '1.5rem' }}
+      <Typography
+        variant="h3"
+        color="primary.main"
+        sx={{ fontWeight: 800, mb: 2 }}
       >
-        Вижте последните новини
-      </Button>
-    </Paper>
-  )
+        &quot;БУРГАС-64&quot;
+      </Typography>
+
+      <Typography
+        variant="h6"
+        color="text.secondary"
+        sx={{ mb: 4, maxWidth: 500 }}
+      >
+        Добре дошли! Присъединете се към нашата шахматна общност в Бургас.
+      </Typography>
+
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <Button
+          component={NavLink}
+          to="/login"
+          variant="outlined"
+          color="primary"
+          size="large"
+          startIcon={<LoginIcon />}
+          sx={{
+            px: 4,
+            py: 1.5,
+            fontSize: '1.1rem',
+            borderWidth: 2,
+            '&:hover': { borderWidth: 2 },
+          }}
+        >
+          Вход
+        </Button>
+      </Box>
+    </Container>
+  );
 }
