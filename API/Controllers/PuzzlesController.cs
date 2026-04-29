@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Puzzles.Commands;
 using Application.Puzzles.DTOs;
 using Application.Puzzles.Queries;
@@ -9,12 +10,13 @@ namespace API.Controllers
     public class PuzzlesController : BaseApiController
     {
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> GetPuzzles([FromQuery] PuzzleParams puzzleParams)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return HandleResult(await Mediator.Send(new GetPuzzleList.Query
             {
-                Params = puzzleParams
+                Params = puzzleParams,
+                UserId = userId,
             }));
         }
 
@@ -44,6 +46,18 @@ namespace API.Controllers
         public async Task<IActionResult> DeletePuzzle(string id)
         {
             return HandleResult(await Mediator.Send(new DeletePuzzle.Command { Id = id }));
+        }
+
+        [Authorize]
+        [HttpPost("{id}/complete")]
+        public async Task<IActionResult> CompletePuzzle(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            return HandleResult(await Mediator.Send(new CompletePuzzle.Command
+            {
+                PuzzleId = id,
+                UserId = userId,
+            }));
         }
     }
 }

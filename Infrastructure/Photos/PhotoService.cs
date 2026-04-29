@@ -1,3 +1,4 @@
+using System.Net;
 using Application.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -21,8 +22,11 @@ public class PhotoService : IPhotoService
         _cloudinary = new Cloudinary(account);
     }
 
-    public async Task<DeletionResult> DeletePhotoAsync(string publicId)
+    public async Task<DeletionResult> DeletePhotoAsync(string? publicId)
     {
+        if (string.IsNullOrWhiteSpace(publicId))
+            return new DeletionResult { Result = "Error deleting photo - missing public ID.", StatusCode = HttpStatusCode.BadRequest };
+
         var deleteParams = new DeletionParams(publicId);
 
         return await _cloudinary.DestroyAsync(deleteParams);
@@ -37,7 +41,7 @@ public class PhotoService : IPhotoService
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(file.FileName, stream),
-            Folder = "ChessBurgas64"
+            Folder = "ChessClubBurgas64"
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);

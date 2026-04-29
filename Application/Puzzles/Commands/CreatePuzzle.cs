@@ -19,12 +19,12 @@ namespace Application.Puzzles.Commands
                 var puzzle = new Puzzle
                 {
                     Id = Guid.NewGuid(),
-                    Title = request.Puzzle.Title,
+                    Number = request.Puzzle.Number,
                     Description = request.Puzzle.Description,
                     Fen = request.Puzzle.Fen,
                     Solution = request.Puzzle.Solution,
                     Difficulty = request.Puzzle.Difficulty,
-                    Date = request.Puzzle.Date,
+                    Category = request.Puzzle.Category
                 };
 
                 context.Puzzles.Add(puzzle);

@@ -35,12 +35,16 @@ export const useAnnouncements = (id?: string) => {
     });
 
     const createAnnouncement = useMutation({
-        mutationFn: async (data: { title: string; description: string; text: string; date: Date; file: Blob }) => {
+        mutationFn: async (data: {
+            title: string;
+            description: string;
+            text: string;
+            file: Blob;
+        }) => {
             const formData = new FormData();
             formData.append('title', data.title);
             formData.append('description', data.description);
             formData.append('text', data.text);
-            formData.append('date', data.date.toISOString());
             formData.append('file', data.file);
 
             const response = await agent.post<string>('/announcements', formData, {
@@ -54,17 +58,28 @@ export const useAnnouncements = (id?: string) => {
     });
 
     const updateAnnouncement = useMutation({
-        mutationFn: async (data: { id: string; title: string; description: string; text: string; date: string }) => {
-            await agent.put(`/announcements/${data.id}`, {
-                title: data.title,
-                description: data.description,
-                text: data.text,
-                date: data.date,
+        mutationFn: async (data: {
+            id: string;
+            title: string;
+            description: string;
+            text: string;
+            file?: Blob | null;
+        }) => {
+            const formData = new FormData();
+            formData.append('announcementDto.id', data.id);
+            formData.append('announcementDto.title', data.title);
+            formData.append('announcementDto.description', data.description);
+            formData.append('announcementDto.text', data.text);
+            if (data.file) {
+                formData.append('file', data.file);
+            }
+            await agent.put(`/announcements/${data.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['announcements'] });
-            if (id) queryClient.invalidateQueries({ queryKey: ['announcements', id] });
+        onSuccess: async (_, variables) => {
+            await queryClient.invalidateQueries({ queryKey: ['announcements'] });
+            await queryClient.invalidateQueries({ queryKey: ['announcements', variables.id] });
         },
     });
 

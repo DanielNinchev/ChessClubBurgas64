@@ -22,10 +22,10 @@ public class GetAnnouncementList
                 .OrderByDescending(a => a.Date)
                 .AsQueryable();
 
-            if (request.Params.StartDate != default)
-            {
-                query = query.Where(a => a.Date >= request.Params.StartDate);
-            }
+            // if (request.Params.StartDate != default)
+            // {
+            //     query = query.Where(a => a.Date >= request.Params.StartDate);
+            // }
 
             if (request.Params.Cursor.HasValue)
             {

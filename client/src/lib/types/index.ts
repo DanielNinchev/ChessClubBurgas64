@@ -27,12 +27,15 @@ export type PagedList<T> = {
 
 export type Puzzle = {
   id: string;
-  title: string;
+  number: number;
   description: string;
   fen: string;
   solution: string;
   difficulty: string;
-  date: string;
+  points: number;
+  whiteToMove: boolean;
+  category: string;
+  isCompleted: boolean;
 }
 
 export type User = {

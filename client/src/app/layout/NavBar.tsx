@@ -493,6 +493,13 @@ export default function NavBar() {
                                             >
                                                 Моят профил
                                             </MenuItem>
+                                            <MenuItem component={Link} to="/puzzles">
+                                                <ListItemIcon>
+                                                    <ExtensionIcon fontSize="small" />
+                                                </ListItemIcon>
+                                                <ListItemText>Задачи</ListItemText>
+                                            </MenuItem>
+                                            <Divider />
                                             <MenuItem onClick={handleLogout}>
                                                 <LogoutIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
                                                 Изход

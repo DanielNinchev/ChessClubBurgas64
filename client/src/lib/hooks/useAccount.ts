@@ -33,7 +33,8 @@ export const useAccount = () => {
             password: string;
             invitationToken: string;
         }) => {
-            await agent.post('/account/register', data);
+            const response = await agent.post('/account/register', data);
+            return response.data;
         },
     });
 
@@ -96,12 +97,18 @@ export const useAccount = () => {
     });
 
     const createInvitation = useMutation({
-        mutationFn: async (data: { email: string; role: string; teacherId?: string }) => {
+        mutationFn: async (data: { email: string; role: string }) => {
             const response = await agent.post<{ registrationLink: string; expiresAt: string }>(
                 '/account/create-invitation',
                 data
             );
             return response.data;
+        },
+    });
+
+    const resendConfirmation = useMutation({
+        mutationFn: async (email: string) => {
+            await agent.post('/account/resend-confirmation', { email });
         },
     });
 
@@ -122,6 +129,7 @@ export const useAccount = () => {
         changePassword,
         validateInvitation,
         createInvitation,
+        resendConfirmation,
         isAdmin,
         isTeacher,
         isStudent,

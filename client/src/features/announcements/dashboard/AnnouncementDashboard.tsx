@@ -15,7 +15,7 @@ export default function AnnouncementDashboard() {
                     </Typography>
                 </Box>
                 <Typography variant="body1" color="text.secondary">
-                    Последни новини и обяви от Шахматен Клуб &quot;Бургас 64&quot;
+                    Последни новини и обяви от Шахматен Клуб &quot;Бургас-64&quot;
                 </Typography>
             </Box>
 

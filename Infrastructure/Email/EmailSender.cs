@@ -25,7 +25,7 @@ public class EmailSender(IResend resend, IConfiguration config) : IEmailSender<A
 
     public async Task SendPasswordResetCodeAsync(Account user, string email, string resetCode)
     {
-        var clientUrl = config["ClientUrl"] ?? "http://localhost:3000";
+        var clientUrl = config["ClientAppUrl"] ?? "http://localhost:3000";
         var resetLink = $"{clientUrl}/reset-password?email={Uri.EscapeDataString(email)}&code={resetCode}";
 
         var subject = "Смяна на парола - Шахматен клуб Бургас 64";

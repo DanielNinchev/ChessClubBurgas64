@@ -4,8 +4,8 @@
 ## Get latest from `dotnet new gitignore`
 
 # Ignore .NET build output
-bin/
-obj/
+**/bin/
+**/obj/
 [Bb]in/
 [Oo]bj/
 [Dd]ebug*/

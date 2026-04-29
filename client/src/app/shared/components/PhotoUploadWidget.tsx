@@ -86,19 +86,68 @@ export default function PhotoUploadWidget({ uploadPhoto, loading }: Props) {
                         <Typography variant="overline" color="secondary">
                             Стъпка 3 - Преглед и качване
                         </Typography>
-                        <div
-                            className="img-preview"
-                            style={{ width: 300, height: 300, overflow: 'hidden' }}
-                        />
-                        <Button
-                            sx={{ my: 1, width: 300 }}
-                            onClick={onCrop}
-                            variant="contained"
-                            color='secondary'
-                            disabled={loading}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 2,
+                            }}
                         >
-                            {loading ? 'Качване...' : 'Качване'}
-                        </Button>
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    maxWidth: 400,
+                                    aspectRatio: '1',
+                                    overflow: 'hidden',
+                                    borderRadius: 2,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={files[0]?.preview}
+                                    alt="Preview"
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'contain',
+                                    }}
+                                />
+                            </Box>
+                            <Box
+                                className="img-preview"
+                                sx={{
+                                    width: '100%',
+                                    maxWidth: 400,
+                                    height: 400,
+                                    overflow: 'hidden',
+                                    borderRadius: 2,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                }}
+                            />
+                            <Box display="flex" gap={2}>
+                                <Button
+                                    onClick={() => setFiles([])}
+                                    variant="outlined"
+                                >
+                                    Назад
+                                </Button>
+                                <Button
+                                    onClick={onCrop}
+                                    variant="contained"
+                                    color="success"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Качване...' : 'Качи снимката'}
+                                </Button>
+                            </Box>
+                        </Box>
                     </>
                 )}
             </Grid2>

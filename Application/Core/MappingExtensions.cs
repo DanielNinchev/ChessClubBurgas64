@@ -49,7 +49,6 @@ public static class MappingExtensions
             Title = dto.Title,
             Description = dto.Description,
             Text = dto.Text,
-            Date = dto.Date,
             MainPhotoUrl = string.Empty,
         };
     }
@@ -59,7 +58,6 @@ public static class MappingExtensions
         announcement.Title = dto.Title;
         announcement.Description = dto.Description;
         announcement.Text = dto.Text;
-        announcement.Date = dto.Date;
     }
 
     // --- Photo ---

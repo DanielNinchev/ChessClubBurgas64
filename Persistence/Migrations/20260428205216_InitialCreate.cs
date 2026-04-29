@@ -18,9 +18,9 @@ namespace Persistence.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Text = table.Column<string>(type: "text", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     MainPhotoUrl = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -50,6 +50,7 @@ namespace Persistence.Migrations
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     MiddleName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
+                    Rating = table.Column<int>(type: "integer", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -71,16 +72,36 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Invitations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<string>(type: "text", nullable: false),
+                    TeacherId = table.Column<string>(type: "text", nullable: true),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsUsed = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invitations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Puzzles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
+                    Number = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Fen = table.Column<string>(type: "text", nullable: false),
                     Solution = table.Column<string>(type: "text", nullable: false),
                     Difficulty = table.Column<string>(type: "text", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Points = table.Column<int>(type: "integer", nullable: false),
+                    WhiteToMove = table.Column<bool>(type: "boolean", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -234,33 +255,27 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Invitations",
+                name: "AccountCompletedPuzzles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Token = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsUsed = table.Column<bool>(type: "boolean", nullable: false),
-                    TeacherId = table.Column<string>(type: "text", nullable: true),
-                    CreatedByAccountId = table.Column<string>(type: "text", nullable: false)
+                    AccountId = table.Column<string>(type: "text", nullable: false),
+                    CompletedPuzzlesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Invitations", x => x.Id);
+                    table.PrimaryKey("PK_AccountCompletedPuzzles", x => new { x.AccountId, x.CompletedPuzzlesId });
                     table.ForeignKey(
-                        name: "FK_Invitations_AspNetUsers_CreatedByAccountId",
-                        column: x => x.CreatedByAccountId,
+                        name: "FK_AccountCompletedPuzzles_AspNetUsers_AccountId",
+                        column: x => x.AccountId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Invitations_TeacherProfiles_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "TeacherProfiles",
-                        principalColumn: "Id");
+                        name: "FK_AccountCompletedPuzzles_Puzzles_CompletedPuzzlesId",
+                        column: x => x.CompletedPuzzlesId,
+                        principalTable: "Puzzles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -343,6 +358,11 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AccountCompletedPuzzles_CompletedPuzzlesId",
+                table: "AccountCompletedPuzzles",
+                column: "CompletedPuzzlesId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Announcements_Date",
                 table: "Announcements",
                 column: "Date");
@@ -385,16 +405,6 @@ namespace Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invitations_CreatedByAccountId",
-                table: "Invitations",
-                column: "CreatedByAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Invitations_TeacherId",
-                table: "Invitations",
-                column: "TeacherId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Lessons_TeacherId",
                 table: "Lessons",
                 column: "TeacherId");
@@ -430,6 +440,9 @@ namespace Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AccountCompletedPuzzles");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

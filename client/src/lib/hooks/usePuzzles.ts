@@ -1,80 +1,80 @@
-import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FieldValues } from "react-hook-form";
-import { useLocation } from "react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
-import { PagedResult, Puzzle } from "../types";
-import { useAccount } from "./useAccount";
-import { useStore } from "./useStore";
+import { Puzzle } from "../types";
 
-export const usePuzzles = (id?: string) => {
-    const { puzzleStore: { difficulty } } = useStore();
+type PuzzleFilters = {
+    pageNumber?: number;
+    pageSize?: number;
+    category?: string;
+    keyword?: string;
+    sort?: string;
+    difficulty?: string;
+};
+
+type PagedPuzzles = {
+    items: Puzzle[];
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+    categories: string[];
+};
+
+export const usePuzzles = (id?: string, filters?: PuzzleFilters) => {
     const queryClient = useQueryClient();
-    const { currentUser } = useAccount();
-    const location = useLocation();
 
-    const { data: puzzlesGroup, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage }
-        = useInfiniteQuery<PagedResult<Puzzle, string>>({
-            queryKey: ['puzzles', difficulty],
-            queryFn: async ({ pageParam = null }) => {
-                const response = await agent.get<PagedResult<Puzzle, string>>('/puzzles', {
-                    params: {
-                        cursor: pageParam,
-                        pageSize: 6,
-                        difficulty: difficulty || undefined,
-                    }
-                });
-                return response.data;
-            },
-            placeholderData: keepPreviousData,
-            initialPageParam: null,
-            getNextPageParam: (lastPage) => lastPage.nextCursor,
-            enabled: !id && location.pathname === '/puzzles' && !!currentUser,
-        });
+    const { data: puzzlesPage, isLoading } = useQuery<PagedPuzzles>({
+        queryKey: ['puzzles', filters],
+        queryFn: async () => {
+            const response = await agent.get<PagedPuzzles>('/puzzles', { params: filters });
+            return response.data;
+        },
+        enabled: !id,
+    });
 
-    const { data: puzzle } = useQuery({
+    const { data: puzzle, isLoading: isLoadingPuzzle } = useQuery<Puzzle>({
         queryKey: ['puzzles', id],
         queryFn: async () => {
             const response = await agent.get<Puzzle>(`/puzzles/${id}`);
             return response.data;
         },
-        enabled: !!id && !!currentUser,
+        enabled: !!id,
     });
 
     const createPuzzle = useMutation({
-        mutationFn: async (puzzle: FieldValues) => {
-            const response = await agent.post('/puzzles', puzzle);
+        mutationFn: async (data: Omit<Puzzle, 'id'>) => {
+            const response = await agent.post<string>('/puzzles', data);
             return response.data;
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['puzzles'] });
-        }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['puzzles'] });
+        },
     });
 
     const updatePuzzle = useMutation({
-        mutationFn: async (puzzle: Puzzle) => {
-            await agent.put('/puzzles', puzzle);
+        mutationFn: async (data: Puzzle) => {
+            await agent.put(`/puzzles/${data.id}`, data);
         },
-        onSuccess: async () => {
-            await queryClient.refetchQueries({ queryKey: ['puzzles'] });
-        }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['puzzles'] });
+            if (id) queryClient.invalidateQueries({ queryKey: ['puzzles', id] });
+        },
     });
 
     const deletePuzzle = useMutation({
-        mutationFn: async (id: string) => {
-            await agent.delete(`/puzzles/${id}`);
+        mutationFn: async (puzzleId: string) => {
+            await agent.delete(`/puzzles/${puzzleId}`);
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['puzzles'] });
-        }
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['puzzles'] });
+        },
     });
 
     return {
-        puzzlesGroup,
+        puzzlesPage,
         isLoading,
-        isFetchingNextPage,
-        fetchNextPage,
-        hasNextPage,
         puzzle,
+        isLoadingPuzzle,
         createPuzzle,
         updatePuzzle,
         deletePuzzle,

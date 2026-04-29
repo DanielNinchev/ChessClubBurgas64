@@ -7,7 +7,7 @@ namespace Application.Puzzles.Validators
     {
         public CreatePuzzleValidator()
         {
-            RuleFor(x => x.Puzzle.Title).NotEmpty().WithMessage("Заглавието е задължително");
+            RuleFor(x => x.Puzzle.Number).NotEmpty().WithMessage("Номерът на задачата е задължителен");
             RuleFor(x => x.Puzzle.Description).NotEmpty().WithMessage("Описанието е задължително");
             RuleFor(x => x.Puzzle.Fen).NotEmpty().WithMessage("FEN позицията е задължителна");
             RuleFor(x => x.Puzzle.Solution).NotEmpty().WithMessage("Решението е задължително");
@@ -19,7 +19,7 @@ namespace Application.Puzzles.Validators
     {
         public EditPuzzleValidator()
         {
-            RuleFor(x => x.Puzzle.Title).NotEmpty().WithMessage("Заглавието е задължително");
+            RuleFor(x => x.Puzzle.Number).NotEmpty().WithMessage("Номерът на задачата е задължителен");
             RuleFor(x => x.Puzzle.Description).NotEmpty().WithMessage("Описанието е задължително");
             RuleFor(x => x.Puzzle.Fen).NotEmpty().WithMessage("FEN позицията е задължителна");
             RuleFor(x => x.Puzzle.Solution).NotEmpty().WithMessage("Решението е задължително");

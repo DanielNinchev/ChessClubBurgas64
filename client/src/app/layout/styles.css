@@ -10,3 +10,13 @@
     width: 100% !important;
     border: none !important;
 }
+
+/* Fix react-chessboard dragged piece positioning */
+[data-piece] {
+    z-index: 9999 !important;
+}
+
+/* Ensure the chessboard container doesn't interfere with drag positioning */
+.chessboard-wrapper {
+    position: relative !important;
+}

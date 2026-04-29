@@ -40,6 +40,10 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<Account>
                 .WithOne(t => t.Account)
                 .HasForeignKey<TeacherProfile>(t => t.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(a => a.CompletedPuzzles)
+                .WithMany()
+                .UsingEntity(j => j.ToTable("AccountCompletedPuzzles"));
         });
 
         builder.Entity<StudentProfile>(entity =>

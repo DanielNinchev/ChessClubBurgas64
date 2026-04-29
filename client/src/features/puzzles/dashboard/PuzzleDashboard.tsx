@@ -1,139 +1,156 @@
+import AddIcon from '@mui/icons-material/Add';
 import ExtensionIcon from '@mui/icons-material/Extension';
+import SearchIcon from '@mui/icons-material/Search';
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Container,
-    FormControl,
-    Grid2,
-    InputLabel,
-    MenuItem,
-    Select,
-    Skeleton,
-    Typography
+    Box, Button, Container, FormControl, Grid2 as Grid,
+    InputAdornment, InputLabel, MenuItem, Pagination,
+    Select, TextField, Typography,
 } from '@mui/material';
-import { observer } from 'mobx-react-lite';
-import { Chessboard } from 'react-chessboard';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
+import { useAccount } from '../../../lib/hooks/useAccount';
 import { usePuzzles } from '../../../lib/hooks/usePuzzles';
-import { useStore } from '../../../lib/hooks/useStore';
-import { Puzzle } from "../../../lib/types";
+import PuzzleCard from './PuzzleCard';
 
-const difficultyColors: Record<string, 'success' | 'warning' | 'error'> = {
-    'Лесна': 'success',
-    'Средна': 'warning',
-    'Трудна': 'error',
-};
+const PAGE_SIZE = 9;
 
-export default observer(function PuzzleDashboard() {
-    const { puzzleStore } = useStore();
-    const { puzzlesGroup, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = usePuzzles();
+export default function PuzzleDashboard() {
+    const [pageNumber, setPageNumber] = useState(1);
+    const [category, setCategory] = useState('');
+    const [keyword, setKeyword] = useState('');
+    const [sort, setSort] = useState('number');
+
+    const filters = useMemo(
+        () => ({
+            pageNumber,
+            pageSize: PAGE_SIZE,
+            category: category || undefined,
+            keyword: keyword || undefined,
+            sort,
+        }),
+        [pageNumber, category, keyword, sort]
+    );
+
+    const { puzzlesPage, isLoading } = usePuzzles(undefined, filters);
+    const { isAdmin, isTeacher } = useAccount();
+    const canCreate = isAdmin || isTeacher;
+
+    const items = puzzlesPage?.items ?? [];
+    const totalPages = puzzlesPage?.totalPages ?? 1;
+    const categories = puzzlesPage?.categories ?? [];
+
+    const resetPage = () => setPageNumber(1);
 
     return (
-        <Container maxWidth="lg" sx={{ pt: 12, pb: 6, minHeight: '100vh' }}>
-            <Box sx={{ textAlign: 'center', mb: 4 }}>
-                <ExtensionIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h4" fontWeight={700} color="primary.dark">
-                    Шахматни задачи
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                    Решавайте задачи и подобрявайте уменията си
-                </Typography>
+        <Container maxWidth="lg" sx={{ pt: 12, pb: 4, minHeight: '100vh' }}>
+
+            {/* Header */}
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Box display="flex" alignItems="center" gap={1}>
+                    <ExtensionIcon fontSize="large" color="primary" />
+                    <Typography variant="h4" fontWeight={700}>Шахматни задачи</Typography>
+                </Box>
+                {canCreate && (
+                    <Button
+                        component={Link}
+                        to="/puzzles/create"
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                    >
+                        Нова задача
+                    </Button>
+                )}
             </Box>
 
-            {/* Filter */}
-            <Box display="flex" justifyContent="center" sx={{ mb: 4 }}>
-                <FormControl sx={{ minWidth: 200 }}>
-                    <InputLabel>Трудност</InputLabel>
+            {/* Filters */}
+            <Box
+                display="flex"
+                gap={2}
+                flexWrap="wrap"
+                mb={3}
+                sx={{ bgcolor: 'background.paper', p: 2, borderRadius: 2, boxShadow: 1 }}
+            >
+                <TextField
+                    label="Търсене"
+                    value={keyword}
+                    onChange={(e) => { setKeyword(e.target.value); resetPage(); }}
+                    size="small"
+                    sx={{ flex: '1 1 220px' }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon fontSize="small" />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+                <FormControl size="small" sx={{ minWidth: 180 }}>
+                    <InputLabel>Категория</InputLabel>
                     <Select
-                        value={puzzleStore.difficulty}
-                        label="Трудност"
-                        onChange={(e) => puzzleStore.setDifficulty(e.target.value)}
+                        value={category}
+                        label="Категория"
+                        onChange={(e) => { setCategory(e.target.value); resetPage(); }}
                     >
                         <MenuItem value="">Всички</MenuItem>
-                        <MenuItem value="Лесна">Лесна</MenuItem>
-                        <MenuItem value="Средна">Средна</MenuItem>
-                        <MenuItem value="Трудна">Трудна</MenuItem>
+                        {categories.map(c => (
+                            <MenuItem key={c} value={c}>{c}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ minWidth: 180 }}>
+                    <InputLabel>Сортиране</InputLabel>
+                    <Select
+                        value={sort}
+                        label="Сортиране"
+                        onChange={(e) => { setSort(e.target.value); resetPage(); }}
+                    >
+                        <MenuItem value="number">По номер</MenuItem>
+                        <MenuItem value="category">По категория</MenuItem>
+                        <MenuItem value="points-asc">Точки ↑</MenuItem>
+                        <MenuItem value="points-desc">Точки ↓</MenuItem>
+                        <MenuItem value="difficulty">По трудност</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
 
-            {/* Puzzles Grid */}
-            <Grid2 container spacing={3}>
-                {isLoading
-                    ? Array.from({ length: 6 }).map((_, i) => (
-                        <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={i}>
-                            <Skeleton variant="rounded" height={350} sx={{ borderRadius: 3 }} />
-                        </Grid2>
-                    ))
-                    : puzzlesGroup?.pages.map((page) =>
-                        page.items.map((puzzle: Puzzle) => (
-                            <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={puzzle.id}>
-                                <Card
-                                    component={Link}
-                                    to={`/puzzles/${puzzle.id}`}
-                                    sx={{
-                                        borderRadius: 3,
-                                        textDecoration: 'none',
-                                        transition: 'transform 0.2s, box-shadow 0.2s',
-                                        '&:hover': {
-                                            transform: 'translateY(-4px)',
-                                            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                                        },
-                                    }}
-                                >
-                                    <Box sx={{ p: 1.5, bgcolor: 'grey.50' }}>
-                                        <Chessboard
-                                            position={puzzle.fen}
-                                            boardWidth={280}
-                                            arePiecesDraggable={false}
-                                        />
-                                    </Box>
-                                    <CardContent>
-                                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                            <Typography variant="h6" fontWeight={600} noWrap>
-                                                {puzzle.title}
-                                            </Typography>
-                                            <Chip
-                                                label={puzzle.difficulty}
-                                                color={difficultyColors[puzzle.difficulty] || 'default'}
-                                                size="small"
-                                            />
-                                        </Box>
-                                        <Typography variant="body2" color="text.secondary" sx={{
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                        }}>
-                                            {puzzle.description}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                                            {new Date(puzzle.date).toLocaleDateString('bg-BG')}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid2>
-                        ))
-                    )}
-            </Grid2>
-
-            {/* Load more */}
-            {hasNextPage && (
-                <Box display="flex" justifyContent="center" sx={{ mt: 4 }}>
-                    <Button
-                        onClick={() => fetchNextPage()}
-                        disabled={isFetchingNextPage}
-                        variant="outlined"
-                        size="large"
-                        sx={{ px: 6, fontWeight: 600 }}
-                    >
-                        {isFetchingNextPage ? 'Зареждане...' : 'Зареди още'}
-                    </Button>
+            {/* Grid */}
+            {isLoading ? (
+                <LoadingComponent />
+            ) : items.length === 0 ? (
+                <Box textAlign="center" py={8}>
+                    <ExtensionIcon sx={{ fontSize: 80, color: 'grey.300', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary">
+                        Няма намерени задачи
+                    </Typography>
                 </Box>
+            ) : (
+                <>
+                    <Grid container spacing={3}>
+                        {items.map((puzzle) => (
+                            <Grid key={puzzle.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                                <PuzzleCard puzzle={puzzle} />
+                            </Grid>
+                        ))}
+                    </Grid>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <Box display="flex" justifyContent="center" mt={4}>
+                            <Pagination
+                                count={totalPages}
+                                page={pageNumber}
+                                onChange={(_, page) => setPageNumber(page)}
+                                color="primary"
+                                showFirstButton
+                                showLastButton
+                                siblingCount={1}
+                                boundaryCount={1}
+                            />
+                        </Box>
+                    )}
+                </>
             )}
         </Container>
     );
-});
+}

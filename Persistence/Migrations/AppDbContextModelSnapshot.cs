@@ -22,6 +22,21 @@ namespace Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AccountPuzzle", b =>
+                {
+                    b.Property<string>("AccountId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CompletedPuzzlesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("AccountId", "CompletedPuzzlesId");
+
+                    b.HasIndex("CompletedPuzzlesId");
+
+                    b.ToTable("AccountCompletedPuzzles", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Account", b =>
                 {
                     b.Property<string>("Id")
@@ -72,6 +87,9 @@ namespace Persistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -127,15 +145,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Invitation", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedByAccountId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -159,10 +174,6 @@ namespace Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedByAccountId");
-
-                    b.HasIndex("TeacherId");
 
                     b.ToTable("Invitations");
                 });
@@ -243,8 +254,9 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -258,13 +270,18 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Number")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Solution")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("WhiteToMove")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -469,21 +486,19 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Invitation", b =>
+            modelBuilder.Entity("AccountPuzzle", b =>
                 {
-                    b.HasOne("Domain.Account", "CreatedByAccount")
+                    b.HasOne("Domain.Account", null)
                         .WithMany()
-                        .HasForeignKey("CreatedByAccountId")
+                        .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.TeacherProfile", "Teacher")
+                    b.HasOne("Domain.Puzzle", null)
                         .WithMany()
-                        .HasForeignKey("TeacherId");
-
-                    b.Navigation("CreatedByAccount");
-
-                    b.Navigation("Teacher");
+                        .HasForeignKey("CompletedPuzzlesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Lesson", b =>

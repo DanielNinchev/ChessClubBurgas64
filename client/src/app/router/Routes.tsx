@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import ChangePasswordForm from "../../features/account/ChangePasswordForm";
+import ConfirmEmailPage from '../../features/account/ConfirmEmailPage';
 import ForgotPasswordForm from "../../features/account/ForgotPasswordForm";
 import LoginForm from "../../features/account/LoginForm";
 import RegisterForm from "../../features/account/RegisterForm";
 import ResetPasswordForm from "../../features/account/ResetPasswordForm";
-import VerifyEmail from "../../features/account/VerifyEmail";
 import CreateInvitationForm from '../../features/admin/CreateInvitationForm';
 import AnnouncementDashboard from "../../features/announcements/dashboard/AnnouncementDashboard";
 import AnnouncementDetails from "../../features/announcements/details/AnnouncementDetails";
@@ -50,9 +50,10 @@ export const router = createBrowserRouter([
             { path: 'login', element: <LoginForm /> },
             { path: 'register', element: <RegisterForm /> },
             { path: 'admin/invitations', element: <CreateInvitationForm /> },
-            { path: 'confirm-email', element: <VerifyEmail /> },
+            { path: 'confirm-email', element: <ConfirmEmailPage /> },
             { path: 'forgot-password', element: <ForgotPasswordForm /> },
             { path: 'reset-password', element: <ResetPasswordForm /> },
+            { path: 'manage/puzzle/:id', element: <PuzzleForm /> },
             { path: '*', element: <Navigate replace to='/not-found' /> },
         ]
     }

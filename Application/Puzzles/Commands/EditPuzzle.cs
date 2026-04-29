@@ -22,12 +22,11 @@ namespace Application.Puzzles.Commands
 
                 if (puzzle == null) return Result<Unit>.Failure("Задачата не е намерена", 404);
 
-                puzzle.Title = request.Puzzle.Title;
+                puzzle.Number = request.Puzzle.Number;
                 puzzle.Description = request.Puzzle.Description;
                 puzzle.Fen = request.Puzzle.Fen;
                 puzzle.Solution = request.Puzzle.Solution;
                 puzzle.Difficulty = request.Puzzle.Difficulty;
-                puzzle.Date = request.Puzzle.Date;
 
                 var result = await context.SaveChangesAsync(cancellationToken) > 0;
 

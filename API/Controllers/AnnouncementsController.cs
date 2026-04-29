@@ -37,10 +37,17 @@ public class AnnouncementsController : BaseApiController
 
     [HttpPut("{id}")]
     [Authorize(Policy = "IsChessClubAdmin")]
-    public async Task<ActionResult> EditAnnouncement(string id, EditAnnouncementDto announcementDto)
+    public async Task<ActionResult> EditAnnouncement(
+        string id,
+        [FromForm] EditAnnouncementDto announcementDto,
+        [FromForm] IFormFile? file)
     {
         announcementDto.Id = id;
-        return HandleResult(await Mediator.Send(new EditAnnouncement.Command { AnnouncementDto = announcementDto }));
+        return HandleResult(await Mediator.Send(new EditAnnouncement.Command
+        {
+            AnnouncementDto = announcementDto,
+            File = file
+        }));
     }
 
     [HttpDelete("{id}")]

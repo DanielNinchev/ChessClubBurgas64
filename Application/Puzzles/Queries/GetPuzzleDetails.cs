@@ -21,13 +21,15 @@ namespace Application.Puzzles.Queries
                     .Where(p => p.Id == Guid.Parse(request.Id))
                     .Select(p => new PuzzleDto
                     {
-                        Id = p.Id.ToString(),
-                        Title = p.Title,
+                        Id = p.Id,
+                        Number = p.Number,
                         Description = p.Description,
                         Fen = p.Fen,
                         Solution = p.Solution,
                         Difficulty = p.Difficulty,
-                        Date = p.Date.ToString("o"),
+                        Category = p.Category,
+                        Points = p.Points,
+                        WhiteToMove = p.WhiteToMove
                     })
                     .FirstOrDefaultAsync(cancellationToken);
 

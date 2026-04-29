@@ -4,7 +4,7 @@ import { Box, Button, CardMedia, Container, Paper, Typography } from "@mui/mater
 import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from "react-router";
-import DateTimeInput from "../../../app/shared/components/DateTimeInput";
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 import PhotoUploadWidget from "../../../app/shared/components/PhotoUploadWidget";
 import SunEditor from "../../../app/shared/components/SunEditor";
 import TextInput from "../../../app/shared/components/TextInput";
@@ -18,23 +18,29 @@ export default function AnnouncementForm() {
     });
     const navigate = useNavigate();
     const { id } = useParams();
-    const { updateAnnouncement, createAnnouncement, announcement } = useAnnouncements(id);
+    const { updateAnnouncement, createAnnouncement, announcement, isLoading } = useAnnouncements(id);
     const [photoFile, setPhotoFile] = useState<Blob | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-    const isEditing = !!announcement;
+    const isEditing = !!id; // use id, not announcement, to determine intent
 
     useEffect(() => {
         if (announcement) {
             reset({
-                ...announcement,
-                date: announcement.date ? new Date(announcement.date) : undefined,
+                title: announcement.title,
+                description: announcement.description,
+                text: announcement.text,
             });
             if (announcement.mainPhotoUrl) {
                 setPhotoPreview(announcement.mainPhotoUrl);
             }
         }
     }, [announcement, reset]);
+
+    // Wait for announcement to load before rendering the form when editing
+    // This ensures SunEditor mounts with the correct initial value
+    if (isEditing && isLoading) return <LoadingComponent />;
+    if (isEditing && !announcement) return <Typography>Новината не е намерена</Typography>;
 
     const handlePhotoSelected = (file: Blob) => {
         setPhotoFile(file);
@@ -44,26 +50,26 @@ export default function AnnouncementForm() {
     const onSubmit = async (data: AnnouncementSchema) => {
         try {
             if (isEditing) {
+                if (!announcement) return;
                 updateAnnouncement.mutate(
                     {
                         id: announcement.id,
                         title: data.title,
                         description: data.description,
                         text: data.text,
-                        date: data.date.toISOString(),
+                        file: photoFile,   // ← pass the new photo (null = keep existing)
                     },
                     {
                         onSuccess: () => navigate(`/announcements/${announcement.id}`)
                     }
                 );
             } else {
-                if (!photoFile) return; // Should not happen due to button disable
+                if (!photoFile) return;
                 createAnnouncement.mutate(
                     {
                         title: data.title,
                         description: data.description,
                         text: data.text,
-                        date: data.date,
                         file: photoFile,
                     },
                     {
@@ -117,8 +123,18 @@ export default function AnnouncementForm() {
                 >
                     <TextInput label="Заглавие" control={control} name="title" />
                     <TextInput label="Описание" control={control} name="description" multiline rows={3} />
-                    <SunEditor label="Текст" control={control} name="text" />
-                    <DateTimeInput label="Дата" control={control} name="date" />
+
+                    {/* 
+                        Key forces SunEditor to remount if announcement changes.
+                        defaultValue seeds the editor on first mount.
+                    */}
+                    <SunEditor
+                        key={announcement?.id ?? 'new'}
+                        label="Текст"
+                        control={control}
+                        name="text"
+                        defaultValue={announcement?.text}
+                    />
 
                     {/* Photo Upload Section */}
                     <Box>
