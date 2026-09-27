@@ -17,13 +17,18 @@ namespace Application.Puzzles.Commands
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
+                if (!Guid.TryParse(request.Puzzle.Id, out var puzzleId))
+                    return Result<Unit>.Failure("Задачата не е намерена", 404);
+
                 var puzzle = await context.Puzzles
-                    .FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.Puzzle.Id), cancellationToken);
+                    .FirstOrDefaultAsync(p => p.Id == puzzleId, cancellationToken);
 
                 if (puzzle == null) return Result<Unit>.Failure("Задачата не е намерена", 404);
 
                 puzzle.Number = request.Puzzle.Number;
                 puzzle.Description = request.Puzzle.Description;
+                // A hand-edited position no longer follows from the stored setup move
+                if (puzzle.Fen != request.Puzzle.Fen) puzzle.PreviousMove = null;
                 puzzle.Fen = request.Puzzle.Fen;
                 puzzle.Solution = request.Puzzle.Solution;
                 puzzle.Difficulty = request.Puzzle.Difficulty;

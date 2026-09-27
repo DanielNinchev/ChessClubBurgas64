@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import ChangePasswordForm from "../../features/account/ChangePasswordForm";
+import ConfirmEmailChangePage from '../../features/account/ConfirmEmailChangePage';
 import ConfirmEmailPage from '../../features/account/ConfirmEmailPage';
 import ForgotPasswordForm from "../../features/account/ForgotPasswordForm";
 import LoginForm from "../../features/account/LoginForm";
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
             { path: 'register', element: <RegisterForm /> },
             { path: 'admin/invitations', element: <CreateInvitationForm /> },
             { path: 'confirm-email', element: <ConfirmEmailPage /> },
+            { path: 'confirm-email-change', element: <ConfirmEmailChangePage /> },
             { path: 'forgot-password', element: <ForgotPasswordForm /> },
             { path: 'reset-password', element: <ResetPasswordForm /> },
             { path: 'manage/puzzle/:id', element: <PuzzleForm /> },

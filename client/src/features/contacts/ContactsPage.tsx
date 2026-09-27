@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Fragment } from 'react';
 import { useForm } from 'react-hook-form';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { toast } from 'react-toastify';
@@ -46,6 +47,12 @@ const contactSchema = z.object({
 
 type ContactSchema = z.infer<typeof contactSchema>;
 
+// TODO: replace the sample emails with the coaches' real addresses
+const COACHES = [
+    { name: 'Живко Жеков', phone: '0888 454 034', email: 'zhivko.zhekov@example.com' },
+    { name: 'Желчо Желев', phone: '0899 941 257', email: 'zhelcho.zhelev@example.com' },
+];
+
 // Chess club coordinates (Спортна зала Нефтохимик, Бургас)
 const CLUB_POSITION: [number, number] = [42.4975, 27.4595];
 
@@ -70,8 +77,8 @@ export default function ContactsPage() {
         <Container maxWidth="lg" sx={{ pt: { xs: 9, md: 12 }, pb: 6, minHeight: '100vh' }}>
             {/* Header */}
             <Paper elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', mb: 4 }}>
-                <Box sx={{ bgcolor: 'primary.main', color: 'white', py: { xs: 2, md: 3 }, textAlign: 'center' }}>
-                    <LocationOnIcon sx={{ fontSize: { xs: 32, md: 40 }, mb: 1 }} />
+                <Box sx={{ bgcolor: 'primary.main', color: 'white', py: { xs: 2, md: 3 }, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5 }}>
+                    <LocationOnIcon sx={{ fontSize: { xs: 32, md: 40 } }} />
                     <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>
                         Контакти
                     </Typography>
@@ -124,18 +131,38 @@ export default function ContactsPage() {
                                     chessburgas64@gmail.com
                                 </MuiLink>
                             </Box>
-                            <Box display="flex" alignItems="center" gap={1.5}>
-                                <PhoneIcon color="primary" />
-                                <Typography fontWeight={500} sx={{ fontSize: { xs: '0.85rem', md: '1rem' } }}>
-                                    0899 941 257 - Желчо Желев
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" gap={1.5}>
-                                <PhoneIcon color="primary" />
-                                <Typography fontWeight={500} sx={{ fontSize: { xs: '0.85rem', md: '1rem' } }}>
-                                    0888 454 034 - Живко Жеков
-                                </Typography>
-                            </Box>
+                        </Box>
+
+                        <Box
+                            display="flex"
+                            justifyContent="center"
+                            mt={3}
+                            sx={{ flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 3, sm: 0 } }}
+                        >
+                            {COACHES.map((coach, index) => (
+                                <Fragment key={coach.name}>
+                                    {index > 0 && (
+                                        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                                    )}
+                                    <Box flex={1} display="flex" flexDirection="column" alignItems="center" gap={1} px={2}>
+                                        <Typography variant="h6" fontWeight={700} color="primary.dark" sx={{ fontSize: { xs: '1rem', md: '1.15rem' } }}>
+                                            {coach.name}
+                                        </Typography>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <PhoneIcon color="primary" fontSize="small" />
+                                            <MuiLink href={`tel:${coach.phone.replace(/\s/g, '')}`} underline="hover" color="text.primary" fontWeight={500} sx={{ fontSize: { xs: '0.85rem', md: '1rem' } }}>
+                                                {coach.phone}
+                                            </MuiLink>
+                                        </Box>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <EmailIcon color="primary" fontSize="small" />
+                                            <MuiLink href={`mailto:${coach.email}`} underline="hover" color="text.primary" fontWeight={500} sx={{ fontSize: { xs: '0.85rem', md: '0.9rem' }, overflowWrap: 'anywhere' }}>
+                                                {coach.email}
+                                            </MuiLink>
+                                        </Box>
+                                    </Box>
+                                </Fragment>
+                            ))}
                         </Box>
 
                         <Divider sx={{ my: 3 }} />

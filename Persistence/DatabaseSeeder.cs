@@ -1,6 +1,7 @@
 using Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ZstdSharp;
 
 namespace Persistence;
 
@@ -117,31 +118,6 @@ public static class DatabaseSeeder
         return "opening";
     }
 
-    /// <summary>
-    /// Applies the opponent's first move to the FEN to get the actual puzzle starting position.
-    /// In the Lichess CSV, the FEN is BEFORE the opponent's last move,
-    /// and Moves[0] is the opponent's move. The puzzle starts AFTER that move.
-    /// </summary>
-    private static (string fen, bool whiteToMove)? ApplyFirstMove(string fen, string firstMoveUci)
-    {
-        // Simple approach: determine who moves from FEN, flip the side
-        // The actual FEN after applying the move requires a chess library.
-        // For seeding, we'll use the FEN as-is and skip the first move in the solution.
-        // The FEN's active color tells us who MADE the last move's opponent,
-        // so after the opponent moves, it's the OTHER side's turn.
-
-        var parts = fen.Split(' ');
-        if (parts.Length < 2) return null;
-
-        // In the CSV: FEN has side X to move, Moves[0] is X's move (the "setup" move)
-        // After Moves[0], the puzzle solver (side Y) needs to find Moves[1], Moves[2], etc.
-        var sideInFen = parts[1]; // 'w' or 'b'
-        // After the opponent (sideInFen) moves, the solver is the OTHER side
-        var whiteToMove = sideInFen == "b"; // if black was to move in FEN, white solves
-
-        return (fen, whiteToMove);
-    }
-
     public static async Task SeedRoles(UserManager<Account> userManager, RoleManager<IdentityRole> roleManager, AppDbContext context)
     {
         // Create roles
@@ -249,13 +225,74 @@ public static class DatabaseSeeder
     /// <summary>
     /// Seeds puzzles from the Lichess puzzle CSV.
     /// CSV format: PuzzleId,FEN,Moves,Rating,RatingDeviation,Popularity,NbPlays,Themes,GameUrl,OpeningTags
+    /// Accepts either the plain .csv or the .csv.zst archive as downloaded from Lichess;
+    /// the archive is decompressed on the fly, so only the lines actually read are unpacked.
     /// </summary>
+    /// <summary>
+    /// Yields the columns of every data row of the Lichess puzzle CSV (plain or .zst), skipping the header.
+    /// </summary>
+    private static async IAsyncEnumerable<string[]> ReadCsvRows(string csvPath)
+    {
+        await using var fileStream = File.OpenRead(csvPath);
+        await using Stream csvStream = csvPath.EndsWith(".zst", StringComparison.OrdinalIgnoreCase)
+            ? new DecompressionStream(fileStream)
+            : fileStream;
+        using var reader = new StreamReader(csvStream);
+
+        await reader.ReadLineAsync(); // header
+
+        string? line;
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            var columns = line.Split(',');
+            if (columns.Length >= 9) yield return columns;
+        }
+    }
+
+    /// <summary>
+    /// Puzzles seeded before the Rating column existed get their Lichess rating back by matching
+    /// position + setup move against the CSV. They came from its first rows, so the scan stops early.
+    /// </summary>
+    private static async Task BackfillRatings(AppDbContext context, string csvPath)
+    {
+        var missing = await context.Puzzles
+            .Where(p => p.Rating == null && p.PreviousMove != null)
+            .ToListAsync();
+        if (missing.Count == 0) return;
+
+        var byKey = missing
+            .GroupBy(p => $"{p.Fen}|{p.PreviousMove}")
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var scanned = 0;
+        await foreach (var columns in ReadCsvRows(csvPath))
+        {
+            if (byKey.Count == 0 || ++scanned > 100_000) break;
+
+            var setupMove = columns[2].Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            if (byKey.Remove($"{columns[1]}|{setupMove}", out var matches) && int.TryParse(columns[3], out var rating))
+            {
+                foreach (var puzzle in matches) puzzle.Rating = rating;
+            }
+        }
+
+        await context.SaveChangesAsync();
+        Console.WriteLine($"Backfilled ratings for {missing.Count(p => p.Rating != null)} of {missing.Count} puzzles.");
+    }
+
     public static async Task SeedPuzzlesFromCSV(AppDbContext context, string csvPath, int count = 500)
     {
-        if (await context.Puzzles.CountAsync() >= count)
+        // Puzzles seeded before PreviousMove existed kept Lichess's pre-setup-move FEN but lost the setup move,
+        // leaving the opponent to move and the puzzle unsolvable. Drop them so they are reseeded correctly.
+        var broken = (await context.Puzzles.Where(p => p.PreviousMove == null).ToListAsync())
+            .Where(p => p.Fen.Split(' ').ElementAtOrDefault(1) != (p.WhiteToMove ? "w" : "b"))
+            .ToList();
+        if (broken.Count > 0)
         {
-            Console.WriteLine($"Already have {await context.Puzzles.CountAsync()} puzzles, skipping seed.");
-            return;
+            Console.WriteLine($"Removing {broken.Count} puzzles seeded without their setup move...");
+            context.Puzzles.RemoveRange(broken);
+            await context.SaveChangesAsync();
         }
 
         if (!File.Exists(csvPath))
@@ -265,27 +302,27 @@ public static class DatabaseSeeder
             return;
         }
 
+        await BackfillRatings(context, csvPath);
+
+        if (await context.Puzzles.CountAsync() >= count)
+        {
+            Console.WriteLine($"Already have {await context.Puzzles.CountAsync()} puzzles, skipping seed.");
+            return;
+        }
+
         Console.WriteLine($"Seeding puzzles from {csvPath}...");
 
         var puzzles = new List<Puzzle>();
         var lineNumber = 0;
+        var needed = count - await context.Puzzles.CountAsync();
 
-        using var reader = new StreamReader(csvPath);
-
-        // Skip header
-        await reader.ReadLineAsync();
-
-        string? line;
-        while ((line = await reader.ReadLineAsync()) != null && puzzles.Count < count)
+        await foreach (var columns in ReadCsvRows(csvPath))
         {
+            if (puzzles.Count >= needed) break;
             lineNumber++;
-            if (string.IsNullOrWhiteSpace(line)) continue;
 
             try
             {
-                var columns = line.Split(',');
-                if (columns.Length < 9) continue;
-
                 var puzzleId = columns[0];
                 var fen = columns[1];
                 var moves = columns[2];     // space-separated UCI moves
@@ -317,9 +354,11 @@ public static class DatabaseSeeder
                     Number = 0, // assigned later in the ordering loop
                     Description = string.Empty,
                     Fen = fen,
+                    PreviousMove = setupMove,
                     Solution = solutionMoves,
                     Difficulty = difficulty,
                     Points = points,
+                    Rating = rating,
                     WhiteToMove = whiteToMove,
                     Category = category,
                 });
@@ -338,6 +377,8 @@ public static class DatabaseSeeder
             .ThenBy(p => p.Points)
             .ToList();
 
+        var firstNumber = (await context.Puzzles.MaxAsync(p => (int?)p.Number) ?? 0) + 1;
+
         for (var i = 0; i < ordered.Count; i++)
         {
             var p = ordered[i];
@@ -348,7 +389,7 @@ public static class DatabaseSeeder
 
             var sideText = p.WhiteToMove ? "Белите" : "Черните";
 
-            p.Number = i + 1;
+            p.Number = firstNumber + i;
             p.Description = $"{sideText} на ход. {bulgarianCategory}.";
             p.Category = bulgarianCategory;
         }

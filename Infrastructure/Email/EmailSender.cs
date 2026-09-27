@@ -60,6 +60,23 @@ public class EmailSender(IResend resend, IConfiguration config) : IEmailSender<A
         await SendMailAsync(email, subject, body);
     }
 
+    public async Task SendChangeEmailLinkAsync(Account user, string newEmail, string confirmationLink)
+    {
+        var subject = "Смяна на имейл адрес - Шахматен клуб Бургас 64";
+        var body = $"""
+            <h2>Потвърждение на нов имейл адрес</h2>
+            <p>Здравейте, {user.FirstName},</p>
+            <p>Получихте това писмо, защото е направена заявка този адрес да стане новият имейл на вашия акаунт.</p>
+            <p>Натиснете линка по-долу, за да потвърдите смяната:</p>
+            <p><a href='{confirmationLink}' style='display:inline-block;padding:12px 24px;background-color:#1976d2;color:white;text-decoration:none;border-radius:6px;font-weight:bold;'>Потвърдете новия имейл</a></p>
+            <p>Ако не сте направили тази заявка, игнорирайте този имейл.</p>
+            <br/>
+            <p style='color:#888;font-size:12px;'>Шахматен клуб Бургас 64</p>
+            """;
+
+        await SendMailAsync(newEmail, subject, body);
+    }
+
     private async Task SendMailAsync(string email, string subject, string body)
     {
         var message = new EmailMessage

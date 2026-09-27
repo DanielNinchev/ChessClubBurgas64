@@ -30,12 +30,46 @@ export type Puzzle = {
   number: number;
   description: string;
   fen: string;
+  previousMove?: string | null;
   solution: string;
   difficulty: string;
   points: number;
+  rating?: number | null;
   whiteToMove: boolean;
   category: string;
   isCompleted: boolean;
+}
+
+export type CompletePuzzleResult = {
+  rating: number;
+  // false when already solved, or (for students) solved out of number order
+  pointsAwarded: boolean;
+  alreadyCompleted: boolean;
+  nextPuzzleNumber: number | null;
+}
+
+export type PuzzleStatGroup = {
+  name: string;
+  completed: number;
+  total: number;
+}
+
+export type PuzzleStats = {
+  totalPuzzles: number;
+  completedCount: number;
+  pointsEarned: number;
+  averageRating: number | null;
+  highestRating: number | null;
+  nextPuzzleNumber: number | null;
+  lastPuzzleNumber: number | null;
+  byDifficulty: PuzzleStatGroup[];
+  byRating: PuzzleStatGroup[];
+  byCategory: PuzzleStatGroup[];
+}
+
+export type PuzzlePlaylist = {
+  items: Puzzle[];
+  currentNumber: number | null;
 }
 
 export type User = {

@@ -97,7 +97,7 @@ public static class MappingExtensions
             MiddleName = a.MiddleName,
             LastName = a.LastName,
             Email = a.Email,
-            PhoneNumber = a.PhoneNumber,
+            PhoneNumber = a.StudentProfile?.PhoneNumber,
             Roles = roles.ToList(),
             BirthDate = a.StudentProfile?.BirthDate,
             Address = a.StudentProfile?.Address,
@@ -110,6 +110,15 @@ public static class MappingExtensions
                 ? $"{a.StudentProfile.Teacher.Account.FirstName} {a.StudentProfile.Teacher.Account.LastName}"
                 : null,
         };
+    }
+
+    public static StudentProfileDto WithoutPrivateData(this StudentProfileDto dto)
+    {
+        dto.Email = null;
+        dto.PhoneNumber = null;
+        dto.Address = null;
+        dto.BirthDate = null;
+        return dto;
     }
 
     public static TeacherProfileDto ToTeacherProfileDto(this Account a, IList<string> roles)
@@ -137,12 +146,20 @@ public static class MappingExtensions
         account.PhoneNumber = dto.PhoneNumber;
     }
 
-    public static void ApplyTo(this EditProfileDto dto, StudentProfile studentProfile)
+    // Blank values clear the field - all student data is optional
+    public static void ApplyTo(this EditStudentDataDto dto, StudentProfile studentProfile)
     {
-        studentProfile.BirthDate = dto.BirthDate ?? studentProfile.BirthDate;
-        studentProfile.Address = dto.Address ?? studentProfile.Address;
-        studentProfile.School = dto.School ?? studentProfile.School;
+        studentProfile.Address = NullIfBlank(dto.Address);
+        studentProfile.School = NullIfBlank(dto.School);
+        studentProfile.PhoneNumber = NullIfBlank(dto.PhoneNumber);
+        // Birth dates are calendar dates: pin them to UTC midnight so no timezone shift can change the day
+        studentProfile.BirthDate = dto.BirthDate.HasValue
+            ? DateTime.SpecifyKind(dto.BirthDate.Value.Date, DateTimeKind.Utc)
+            : null;
     }
+
+    private static string? NullIfBlank(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     public static void ApplyTo(this EditProfileDto dto, TeacherProfile teacherProfile)
     {

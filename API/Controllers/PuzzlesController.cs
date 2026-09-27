@@ -20,11 +20,27 @@ namespace API.Controllers
             }));
         }
 
-        [HttpGet("{id}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetPuzzle(string id)
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetPuzzleStats()
         {
-            return HandleResult(await Mediator.Send(new GetPuzzleDetails.Query { Id = id }));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            return HandleResult(await Mediator.Send(new GetPuzzleStats.Query { UserId = userId }));
+        }
+
+        [HttpGet("playlist")]
+        public async Task<IActionResult> GetPuzzlePlaylist([FromQuery] int around)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            return HandleResult(await Mediator.Send(new GetPuzzlePlaylist.Query { Around = around, UserId = userId }));
+        }
+
+        // The :guid constraint keeps literal routes like "stats" from ever being treated as puzzle ids
+        [HttpGet("{id:guid}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPuzzle(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return HandleResult(await Mediator.Send(new GetPuzzleDetails.Query { Id = id, UserId = userId }));
         }
 
         [HttpPost]
@@ -41,15 +57,15 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new EditPuzzle.Command { Puzzle = puzzle }));
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [Authorize(Policy = "IsChessClubAdmin")]
-        public async Task<IActionResult> DeletePuzzle(string id)
+        public async Task<IActionResult> DeletePuzzle(Guid id)
         {
             return HandleResult(await Mediator.Send(new DeletePuzzle.Command { Id = id }));
         }
 
         [Authorize]
-        [HttpPost("{id}/complete")]
+        [HttpPost("{id:guid}/complete")]
         public async Task<IActionResult> CompletePuzzle(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

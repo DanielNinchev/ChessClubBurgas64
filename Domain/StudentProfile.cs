@@ -3,7 +3,7 @@ namespace Domain;
 public class StudentProfile
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public DateTime BirthDate { get; set; }
+    public DateTime? BirthDate { get; set; }
     public string? Address { get; set; }
     public string? School { get; set; }
     public DateTime? DateOfJoiningClub { get; set; }

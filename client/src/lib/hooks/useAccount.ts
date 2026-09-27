@@ -86,6 +86,35 @@ export const useAccount = () => {
         },
     });
 
+    const changeEmail = useMutation({
+        mutationFn: async (data: { newEmail: string; currentPassword: string }) => {
+            await agent.post('/account/change-email', data);
+        },
+    });
+
+    const confirmEmailChange = useMutation({
+        mutationFn: async (data: { userId: string; newEmail: string; token: string }) => {
+            await agent.post('/account/confirm-email-change', data);
+        },
+        onSuccess: () => {
+            // The server signs the user out after the email changes
+            queryClient.setQueryData(['user'], null);
+            queryClient.clear();
+        },
+    });
+
+    const exportData = useMutation({
+        mutationFn: async () => {
+            const response = await agent.get<Blob>('/account/export-data', { responseType: 'blob' });
+            const url = URL.createObjectURL(response.data);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `chessclub-burgas64-data-${new Date().toISOString().slice(0, 10)}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        },
+    });
+
     const validateInvitation = useMutation({
         mutationFn: async (token: string) => {
             const response = await agent.get<{ email: string; role: string }>(
@@ -127,6 +156,9 @@ export const useAccount = () => {
         forgotPassword,
         resetPassword,
         changePassword,
+        changeEmail,
+        confirmEmailChange,
+        exportData,
         validateInvitation,
         createInvitation,
         resendConfirmation,

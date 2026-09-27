@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using API.DTOs;
 using Domain;
+using Infrastructure.Email;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +20,7 @@ public class AccountController(
     UserManager<Account> userManager,
     SignInManager<Account> signInManager,
     IEmailSender<Account> emailSender,
+    EmailSender accountEmailSender,
     IConfiguration config,
     AppDbContext context) : ControllerBase
 {
@@ -246,5 +249,153 @@ public class AccountController(
         }
 
         return Ok();
+    }
+
+    [Authorize]
+    [HttpPost("change-email")]
+    public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
+    {
+        var user = await userManager.Users
+            .FirstOrDefaultAsync(u => u.Email == User.FindFirstValue(ClaimTypes.Email));
+
+        if (user == null) return Unauthorized();
+
+        if (!await userManager.CheckPasswordAsync(user, dto.CurrentPassword))
+            return BadRequest("Грешна парола");
+
+        if (string.Equals(user.Email, dto.NewEmail, StringComparison.OrdinalIgnoreCase))
+            return BadRequest("Новият имейл съвпада с текущия");
+
+        if (await userManager.FindByEmailAsync(dto.NewEmail) != null)
+            return BadRequest("Потребител с този имейл вече съществува");
+
+        var token = await userManager.GenerateChangeEmailTokenAsync(user, dto.NewEmail);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        var clientUrl = config["ClientAppUrl"] ?? "http://localhost:3000";
+        var confirmLink = $"{clientUrl}/confirm-email-change?userId={Uri.EscapeDataString(user.Id)}" +
+            $"&email={Uri.EscapeDataString(dto.NewEmail)}&token={encodedToken}";
+
+        await accountEmailSender.SendChangeEmailLinkAsync(user, dto.NewEmail, confirmLink);
+
+        return Ok();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("confirm-email-change")]
+    public async Task<ActionResult> ConfirmEmailChange([FromBody] ConfirmEmailChangeDto dto)
+    {
+        var user = await userManager.FindByIdAsync(dto.UserId);
+        if (user == null) return BadRequest("Невалиден линк за потвърждение");
+
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.Token));
+        var result = await userManager.ChangeEmailAsync(user, dto.NewEmail, decodedToken);
+
+        if (!result.Succeeded)
+            return BadRequest("Линкът за потвърждение е невалиден или е изтекъл");
+
+        // Usernames mirror emails, so keep them in sync
+        await userManager.SetUserNameAsync(user, dto.NewEmail);
+
+        // The auth cookie still carries the old email claim - force a fresh login
+        await signInManager.SignOutAsync();
+
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpGet("export-data")]
+    public async Task<ActionResult> ExportData()
+    {
+        var user = await userManager.Users
+            .Include(u => u.StudentProfile)
+            .Include(u => u.TeacherProfile)
+            .Include(u => u.CompletedPuzzles)
+            .FirstOrDefaultAsync(u => u.Email == User.FindFirstValue(ClaimTypes.Email));
+
+        if (user == null) return Unauthorized();
+
+        var roles = await userManager.GetRolesAsync(user);
+
+        var student = user.StudentProfile;
+        var teacher = user.TeacherProfile;
+
+        var attendedLessons = student == null ? [] : await context.LessonStudents
+            .Where(ls => ls.StudentId == student.Id)
+            .OrderBy(ls => ls.Lesson.StartingTime)
+            .Select(ls => new
+            {
+                ls.Lesson.Topic,
+                ls.Lesson.StartingTime,
+                ls.IsPresent,
+                ls.Notes,
+            })
+            .ToListAsync<object>();
+
+        var taughtLessons = teacher == null ? [] : await context.Lessons
+            .Where(l => l.TeacherId == teacher.Id)
+            .OrderBy(l => l.StartingTime)
+            .Select(l => new
+            {
+                l.Topic,
+                l.StartingTime,
+                l.Notes,
+                StudentCount = l.LessonStudents.Count,
+            })
+            .ToListAsync<object>();
+
+        var invitations = await context.Invitations
+            .Where(i => i.Email == user.Email)
+            .Select(i => new { i.Role, i.CreatedAt, i.ExpiresAt, i.IsUsed })
+            .ToListAsync();
+
+        var export = new
+        {
+            ExportedAt = DateTime.UtcNow,
+            Account = new
+            {
+                user.Id,
+                user.Email,
+                user.EmailConfirmed,
+                user.FirstName,
+                user.MiddleName,
+                user.LastName,
+                user.PhoneNumber,
+                user.Rating,
+                Roles = roles,
+            },
+            StudentProfile = student == null ? null : new
+            {
+                student.BirthDate,
+                student.Address,
+                student.School,
+                student.PhoneNumber,
+                student.DateOfJoiningClub,
+                student.ClubRating,
+                student.FideRating,
+                student.PuzzlePoints,
+                student.IsFiled,
+            },
+            TeacherProfile = teacher == null ? null : new
+            {
+                teacher.Bio,
+                teacher.Specialization,
+            },
+            AttendedLessons = attendedLessons,
+            TaughtLessons = taughtLessons,
+            CompletedPuzzles = user.CompletedPuzzles
+                .OrderBy(p => p.Number)
+                .Select(p => new { p.Number, p.Category, p.Difficulty, p.Points }),
+            Invitations = invitations,
+        };
+
+        var json = JsonSerializer.SerializeToUtf8Bytes(export, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
+        });
+
+        return File(json, "application/json", $"chessclub-burgas64-data-{DateTime.UtcNow:yyyy-MM-dd}.json");
     }
 }

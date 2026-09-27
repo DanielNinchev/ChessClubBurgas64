@@ -72,12 +72,13 @@ builder.Services.AddSingleton<IResend>(sp =>
     var httpClient = httpClientFactory.CreateClient(nameof(ResendClient));
     return new ResendClient(options, httpClient);
 });
-builder.Services.AddSingleton<IEmailSender<Account>>(sp =>
+builder.Services.AddSingleton(sp =>
 {
     var resend = sp.GetRequiredService<IResend>();
     var config = sp.GetRequiredService<IConfiguration>();
     return new EmailSender(resend, config);
 });
+builder.Services.AddSingleton<IEmailSender<Account>>(sp => sp.GetRequiredService<EmailSender>());
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -144,9 +145,14 @@ try
     await DatabaseSeeder.SeedRoles(userManager, roleManager, context);
 
     var solutionRoot = Directory.GetParent(AppContext.BaseDirectory)!.Parent!.Parent!.Parent!.Parent!.FullName;
-    var puzzleCsvPath = Path.Combine(solutionRoot, "Persistence", "lichess_db_puzzle.csv");
+    var puzzleCsvPath = Path.Combine(solutionRoot, "Persistence", "lichess_db_puzzle.csv.zst");
+    if (!File.Exists(puzzleCsvPath))
+        puzzleCsvPath = Path.Combine(solutionRoot, "Persistence", "lichess_db_puzzle.csv");
 
     await DatabaseSeeder.SeedPuzzlesFromCSV(context, puzzleCsvPath, count: 500);
+
+    if (app.Environment.IsDevelopment())
+        await SampleDataSeeder.SeedAsync(userManager, context);
 }
 catch (Exception ex)
 {

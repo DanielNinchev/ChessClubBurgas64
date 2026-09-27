@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import agent from "../api/agent";
 import { EditProfileSchema } from "../schemas/editProfileSchema";
+import { StudentDataSchema } from "../schemas/studentDataSchema";
 import { Photo, Profile, User } from '../types';
 
 export const useProfile = (id?: string, predicate?: string) => {
@@ -67,20 +68,7 @@ export const useProfile = (id?: string, predicate?: string) => {
             await agent.put(`/profiles`, profileData);
         },
         onSuccess: (_, profileData) => {
-            queryClient.setQueryData(['profile', id], (data: Profile) => {
-                if (!data) return data;
-                return {
-                    ...data,
-                    firstName: profileData.firstName,
-                    middleName: profileData.middleName,
-                    lastName: profileData.lastName,
-                    phoneNumber: profileData.phoneNumber,
-                    bio: profileData.bio,
-                    address: profileData.address,
-                    school: profileData.school,
-                    specialization: profileData.specialization,
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: ['profile', id] });
             queryClient.setQueryData(['user'], (userData: User) => {
                 if (!userData) return userData;
                 return {
@@ -90,6 +78,19 @@ export const useProfile = (id?: string, predicate?: string) => {
                     lastName: profileData.lastName,
                 }
             });
+        }
+    })
+
+    const updateStudentData = useMutation({
+        mutationFn: async (data: StudentDataSchema) => {
+            await agent.put('/profiles/student-data', {
+                ...data,
+                // The API expects a date or nothing, never an empty string
+                birthDate: data.birthDate || null,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['profile', id] });
         }
     })
 
@@ -107,6 +108,7 @@ export const useProfile = (id?: string, predicate?: string) => {
         setMainPhoto,
         deletePhoto,
         updateProfile,
+        updateStudentData,
         setFilter,
         filter
     }

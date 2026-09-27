@@ -4,6 +4,7 @@ import { Box, Card, Chip, Typography } from '@mui/material';
 import { Chessboard } from 'react-chessboard';
 import { Link } from 'react-router';
 import { Puzzle } from '../../../lib/types';
+import { puzzleStartFen } from '../../../lib/util/puzzleUtils';
 
 type Props = { puzzle: Puzzle };
 
@@ -66,7 +67,7 @@ export default function PuzzleCard({ puzzle }: Props) {
                 <Box sx={{ width: BOARD_SIZE, height: BOARD_SIZE }}>
                     <Chessboard
                         id={`card-${puzzle.id}`}
-                        position={puzzle.fen}
+                        position={puzzleStartFen(puzzle)}
                         arePiecesDraggable={false}
                         boardOrientation={puzzle.whiteToMove ? 'white' : 'black'}
                         boardWidth={BOARD_SIZE}

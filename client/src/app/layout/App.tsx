@@ -20,16 +20,8 @@ export default function App() {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        {/* Semi-transparent overlay for readability */}
-        <Box
-          sx={{
-            minHeight: '100vh',
-            backgroundColor: 'rgba(240, 244, 248, 0.82)',
-          }}
-        >
-          <NavBar />
-          <Outlet />
-        </Box>
+        <NavBar />
+        <Outlet />
       </Box>
     </ThemeProvider>
   );

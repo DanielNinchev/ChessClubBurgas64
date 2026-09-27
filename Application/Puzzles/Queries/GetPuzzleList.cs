@@ -67,9 +67,11 @@ public class GetPuzzleList
                     Number      = x.Number,
                     Description = x.Description,
                     Fen         = x.Fen,
+                    PreviousMove = x.PreviousMove,
                     Solution    = x.Solution,
                     Difficulty  = x.Difficulty,
                     Points      = x.Points,
+                    Rating      = x.Rating,
                     WhiteToMove = x.WhiteToMove,
                     Category    = x.Category,
                 })

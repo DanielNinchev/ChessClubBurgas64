@@ -9,7 +9,7 @@ namespace Application.Puzzles.Commands
     {
         public class Command : IRequest<Result<Unit>>
         {
-            public required string Id { get; set; }
+            public Guid Id { get; set; }
         }
 
         public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
@@ -17,7 +17,7 @@ namespace Application.Puzzles.Commands
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var puzzle = await context.Puzzles
-                    .FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.Id), cancellationToken);
+                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
                 if (puzzle == null) return Result<Unit>.Failure("Задачата не е намерена", 404);
 

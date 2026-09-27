@@ -533,3 +533,4 @@ API/reactivities.db-shm
 /ChessClubBurgas64.Web/appsettings.Development.json
 /ChessClubBurgas64.Web/Properties/launchSettings.json
 Persistence/lichess_db_puzzle.csv
+Persistence/lichess_db_puzzle.csv.zst

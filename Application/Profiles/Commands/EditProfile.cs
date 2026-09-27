@@ -21,7 +21,6 @@ public class EditProfile
             var user = await userAccessor.GetUserAsync();
 
             var account = await context.Users
-                .Include(u => u.StudentProfile)
                 .Include(u => u.TeacherProfile)
                 .FirstOrDefaultAsync(u => u.Id == user.Id, cancellationToken);
 
@@ -31,22 +30,16 @@ public class EditProfile
             // Apply common fields
             request.ProfileData.ApplyTo(account);
 
-            // Apply role-specific fields
-            if (account.StudentProfile != null)
-            {
-                request.ProfileData.ApplyTo(account.StudentProfile);
-            }
-
+            // Apply role-specific fields (student data has its own command: EditStudentData)
             if (account.TeacherProfile != null)
             {
                 request.ProfileData.ApplyTo(account.TeacherProfile);
             }
 
-            var result = await context.SaveChangesAsync(cancellationToken) > 0;
+            // Saving unchanged data is still a success
+            await context.SaveChangesAsync(cancellationToken);
 
-            return result
-                ? Result<Unit>.Success(Unit.Value)
-                : Result<Unit>.Failure("Неуспешно обновяване на профила", 400);
+            return Result<Unit>.Success(Unit.Value);
         }
     }
 }

@@ -24,15 +24,13 @@ export default function ProfileEditForm({ profile, setEditMode }: Props) {
             middleName: profile?.middleName ?? '',
             lastName: profile?.lastName ?? '',
             phoneNumber: profile?.phoneNumber ?? '',
-            address: profile?.address ?? '',
-            school: profile?.school ?? '',
             bio: profile?.bio ?? '',
             specialization: profile?.specialization ?? '',
         }
     });
 
     const onSubmit = (data: EditProfileSchema) => {
-        updateProfile.mutate(data, {
+        updateProfile.mutate(isStudent ? { ...data, phoneNumber: undefined } : data, {
             onSuccess: () => setEditMode(false)
         });
     };
@@ -46,14 +44,8 @@ export default function ProfileEditForm({ profile, setEditMode }: Props) {
             <TextInput label="Име" control={control} name="firstName" />
             <TextInput label="Презиме" control={control} name="middleName" />
             <TextInput label="Фамилия" control={control} name="lastName" />
-            <TextInput label="Телефон" control={control} name="phoneNumber" />
-
-            {isStudent && (
-                <>
-                    <TextInput label="Адрес" control={control} name="address" />
-                    <TextInput label="Училище" control={control} name="school" />
-                </>
-            )}
+            {/* Students edit their phone, address and school under "Ученически данни" */}
+            {!isStudent && <TextInput label="Телефон" control={control} name="phoneNumber" />}
 
             {isTeacher && (
                 <>

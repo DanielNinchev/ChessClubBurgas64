@@ -42,7 +42,9 @@ export default function ProfileContent() {
       mt={12}
       p={3}
       elevation={3}
-      sx={{ display: 'flex', alignItems: 'flex-start', borderRadius: 3, minHeight: 500 }}
+      // No backdrop-filter: the puzzle board's drag preview would be offset (see PuzzleBoard).
+      // A more opaque background makes up for the missing blur.
+      sx={{ display: 'flex', alignItems: 'flex-start', borderRadius: 3, minHeight: 500, backdropFilter: 'none', backgroundColor: 'rgba(255, 255, 255, 0.97)' }}
     >
       <Tabs
         orientation="vertical"

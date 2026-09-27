@@ -40,6 +40,9 @@
     
     <!-- Email -->
     <PackageVersion Include="Resend" Version="0.2.1" />
+
+    <!-- Compression (Lichess puzzle dump is .csv.zst) -->
+    <PackageVersion Include="ZstdSharp.Port" Version="0.8.8" />
   </ItemGroup>
 
 </Project>
