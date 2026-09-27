@@ -88,3 +88,27 @@ export type InvitationValidation = {
   email: string;
   role: string;
 }
+
+export type Lesson = {
+  id: string;
+  topic: string;
+  startingTime: string;
+  notes: string | null;
+  teacherId: string;
+  teacherName: string;
+  attendedStudentsCount: number;
+  students: LessonStudent[];
+}
+
+export type LessonStudent = {
+  studentId: string;
+  studentName: string;
+}
+
+export type OffsetPagedResult<T> = {
+  items: T[];
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalCount: number;
+}

@@ -2,7 +2,7 @@ namespace Domain;
 
 public class StudentProfile
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime BirthDate { get; set; }
     public string? Address { get; set; }
     public string? School { get; set; }
@@ -10,6 +10,8 @@ public class StudentProfile
     public int? ClubRating { get; set; }
     public int? FideRating { get; set; }
     public int? PuzzlePoints { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool IsFiled { get; set; }
 
     // Foreign key
     public required string AccountId { get; set; }

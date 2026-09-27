@@ -1,14 +1,50 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Button, Divider, Typography } from "@mui/material";
-import { useState } from "react";
+import SaveIcon from '@mui/icons-material/Save';
+import {
+    Box, Button, Divider,
+    Typography
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useProfile } from "../../lib/hooks/useProfile";
 import ProfileEditForm from "./ProfileEditForm";
 
 export default function ProfileAbout() {
     const { id } = useParams();
-    const { profile, isCurrentUser } = useProfile(id);
+    const { profile, isCurrentUser, updateProfile } = useProfile(id);
     const [editMode, setEditMode] = useState(false);
+
+    const [firstName, setFirstName] = useState('');
+    const [middleName, setMiddleName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [bio, setBio] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    // Populate form whenever profile loads/changes
+    useEffect(() => {
+        if (profile) {
+            setFirstName(profile.firstName ?? '');
+            setMiddleName(profile.middleName ?? '');
+            setLastName(profile.lastName ?? '');
+            setEmail(profile.email ?? '');
+            setPhoneNumber(profile.phoneNumber ?? '');
+            setBio(profile.bio ?? '');
+        }
+    }, [profile]);
+
+    const handleSave = async () => {
+        if (!profile) return;
+        setSaving(true);
+        try {
+            await updateProfile.mutateAsync({
+                firstName, middleName, lastName, email, phoneNumber, bio,
+            });
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ');
 
@@ -54,6 +90,18 @@ export default function ProfileAbout() {
                     </Box>
                 )}
             </Box>
+            {isCurrentUser && !editMode && (
+                <Box mt={3} display="flex" justifyContent="flex-end">
+                    <Button
+                        variant="contained"
+                        startIcon={<SaveIcon />}
+                        onClick={handleSave}
+                        disabled={saving}
+                    >
+                        {saving ? 'Запазване...' : 'Запази'}
+                    </Button>
+                </Box>
+            )}
         </Box>
     )
 }

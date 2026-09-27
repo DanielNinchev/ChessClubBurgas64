@@ -18,7 +18,6 @@ using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(TimeProvider.System);
-// Add services to the container.
 builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -142,7 +141,7 @@ try
         logger.LogWarning(ex, "Migration skipped - database may already be up to date.");
     }
 
-    await DatabaseSeeder.SeedRoles(userManager, roleManager);
+    await DatabaseSeeder.SeedRoles(userManager, roleManager, context);
 
     var solutionRoot = Directory.GetParent(AppContext.BaseDirectory)!.Parent!.Parent!.Parent!.Parent!.FullName;
     var puzzleCsvPath = Path.Combine(solutionRoot, "Persistence", "lichess_db_puzzle.csv");

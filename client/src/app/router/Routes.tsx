@@ -15,10 +15,14 @@ import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import TestErrors from "../../features/errors/TestErrors";
 import HomePage from "../../features/home/HomePage";
-import ProfilePage from "../../features/profiles/ProfilePage";
+import LessonDashboard from "../../features/lessons/dashboard/LessonDashboard";
+import LessonDetails from "../../features/lessons/details/LessonDetails";
+import LessonForm from "../../features/lessons/form/LessonForm";
+import { default as ProfilePage, default as StudentProfilePage } from "../../features/profiles/ProfilePage";
 import PuzzleDashboard from "../../features/puzzles/dashboard/PuzzleDashboard";
 import PuzzleDetails from "../../features/puzzles/details/PuzzleDetails";
 import PuzzleForm from "../../features/puzzles/form/PuzzleForm";
+import StudentsPage from "../../features/students/StudentsPage";
 import App from "../layout/App";
 import RequireAuth from "./RequireAuth";
 
@@ -34,7 +38,12 @@ export const router = createBrowserRouter([
                     { path: 'puzzles/create', element: <PuzzleForm key='create' /> },
                     { path: 'puzzles/update/:id', element: <PuzzleForm key='update' /> },
                     { path: 'profiles/:id', element: <ProfilePage /> },
+                    { path: 'student-profile', element: <StudentProfilePage /> },
                     { path: 'change-password', element: <ChangePasswordForm /> },
+                    { path: 'lessons', element: <LessonDashboard /> },
+                    { path: 'lessons/:id', element: <LessonDetails /> },
+                    { path: 'lessons/create', element: <LessonForm key='create' /> },
+                    { path: 'lessons/edit/:id', element: <LessonForm key='edit' /> },
                 ]
             },
             { path: '', element: <HomePage /> },
@@ -54,6 +63,7 @@ export const router = createBrowserRouter([
             { path: 'forgot-password', element: <ForgotPasswordForm /> },
             { path: 'reset-password', element: <ResetPasswordForm /> },
             { path: 'manage/puzzle/:id', element: <PuzzleForm /> },
+            { path: 'students', element: <StudentsPage /> },
             { path: '*', element: <Navigate replace to='/not-found' /> },
         ]
     }

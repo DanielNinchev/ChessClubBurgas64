@@ -45,19 +45,24 @@ agent.interceptors.response.use(
                 }
                 break;
             case 401:
-                // Silently ignore 401 for endpoints that don't require auth
+                // TODO: check if this is a good practice
                 if (
                     !config.url?.includes('/account/user-info') &&
                     !config.url?.includes('/login') &&
                     !config.url?.includes('/account/forgot-password') &&
                     !config.url?.includes('/account/reset-password') &&
-                    !config.url?.includes('/account/register')
+                    !config.url?.includes('/account/register') &&
+                    !config.url?.includes('/announcements') &&
+                    !config.url?.includes('/students')
                 ) {
                     toast.error('Не сте влезли в профила си!');
                 }
                 break;
             case 404:
-                router.navigate('/not-found');
+                // Only redirect for GET requests, not for mutation failures
+                if (error.config?.method === 'get') {
+                    router.navigate('/not-found');
+                }
                 break;
             case 500:
                 router.navigate('/server-error', { state: { error: data } })

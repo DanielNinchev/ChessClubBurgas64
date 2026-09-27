@@ -2,10 +2,10 @@
 
 public class LessonStudent
 {
-    public required string LessonId { get; set; }
+    public required Guid LessonId { get; set; }
     public virtual Lesson Lesson { get; set; } = null!;
 
-    public required string StudentId { get; set; }
+    public required Guid StudentId { get; set; }
     public virtual StudentProfile Student { get; set; } = null!;
 
     // Attendance tracking

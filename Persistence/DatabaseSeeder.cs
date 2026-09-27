@@ -142,7 +142,7 @@ public static class DatabaseSeeder
         return (fen, whiteToMove);
     }
 
-    public static async Task SeedRoles(UserManager<Account> userManager, RoleManager<IdentityRole> roleManager)
+    public static async Task SeedRoles(UserManager<Account> userManager, RoleManager<IdentityRole> roleManager, AppDbContext context)
     {
         // Create roles
         string[] roles = ["Admin", "Teacher", "Student"];
@@ -165,15 +165,84 @@ public static class DatabaseSeeder
                 Email = adminEmail,
                 FirstName = "Daniel",
                 MiddleName = "Borislavov",
-                LastName = "Ninchev"
+                LastName = "Ninchev",
+                EmailConfirmed = true
             };
             await userManager.CreateAsync(adminUser, "Test1234!");
         }
 
-        // Assign Admin role to your account
+        var teacherUserEmail = "teacher@example.com";
+        var teacherUser = await userManager.FindByEmailAsync(teacherUserEmail);
+        if (teacherUser == null)
+        {
+            teacherUser = new Account
+            {
+                UserName = teacherUserEmail,
+                Email = teacherUserEmail,
+                FirstName = "Zhelcho",
+                MiddleName = "Ivanov",
+                LastName = "Zhelev",
+                EmailConfirmed = true
+            };
+            await userManager.CreateAsync(teacherUser, "Test1234!");
+        }
+
+        var studentUserEmail = "student@example.com";
+        var studentUser = await userManager.FindByEmailAsync(studentUserEmail);
+        if (studentUser == null)
+        {
+            studentUser = new Account
+            {
+                UserName = studentUserEmail,
+                Email = studentUserEmail,
+                FirstName = "Ivan",
+                MiddleName = "Petrov",
+                LastName = "Dimitrov",
+                EmailConfirmed = true,
+            };
+            await userManager.CreateAsync(studentUser, "Test1234!");
+        }
+
         if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
         {
             await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+        if (!await userManager.IsInRoleAsync(teacherUser, "Teacher"))
+        {
+            await userManager.AddToRoleAsync(teacherUser, "Teacher");
+        }
+        if (!await userManager.IsInRoleAsync(studentUser, "Student"))
+        {
+            await userManager.AddToRoleAsync(studentUser, "Student");
+        }
+
+        // Seed TeacherProfile for teacher user
+        var teacherProfile = await context.TeacherProfiles
+            .FirstOrDefaultAsync(tp => tp.AccountId == teacherUser.Id);
+        if (teacherProfile == null)
+        {
+            teacherProfile = new TeacherProfile
+            {
+                Id = Guid.NewGuid().ToString(),
+                AccountId = teacherUser.Id,
+            };
+            context.TeacherProfiles.Add(teacherProfile);
+            await context.SaveChangesAsync();
+        }
+
+        // Seed StudentProfile for student user
+        var studentProfile = await context.StudentProfiles
+            .FirstOrDefaultAsync(sp => sp.AccountId == studentUser.Id);
+        if (studentProfile == null)
+        {
+            studentProfile = new StudentProfile
+            {
+                Id = Guid.NewGuid(),
+                AccountId = studentUser.Id,
+                TeacherId = teacherProfile.Id,
+            };
+            context.StudentProfiles.Add(studentProfile);
+            await context.SaveChangesAsync();
         }
     }
 
@@ -244,15 +313,15 @@ public static class DatabaseSeeder
 
                 puzzles.Add(new Puzzle
                 {
-                    Id          = Guid.NewGuid(),
-                    Number      = 0, // assigned later in the ordering loop
+                    Id = Guid.NewGuid(),
+                    Number = 0, // assigned later in the ordering loop
                     Description = string.Empty,
-                    Fen         = fen,
-                    Solution    = solutionMoves,
-                    Difficulty  = difficulty,
-                    Points      = points,
+                    Fen = fen,
+                    Solution = solutionMoves,
+                    Difficulty = difficulty,
+                    Points = points,
                     WhiteToMove = whiteToMove,
-                    Category    = category,
+                    Category = category,
                 });
             }
             catch (Exception ex)

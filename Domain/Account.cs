@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain;
@@ -13,4 +14,7 @@ public class Account : IdentityUser
     // Navigation properties — one of these will be populated based on role
     public virtual StudentProfile? StudentProfile { get; set; }
     public virtual TeacherProfile? TeacherProfile { get; set; }
+
+    [NotMapped]
+    public string DisplayName => $"{FirstName} {LastName}".Trim();
 }
